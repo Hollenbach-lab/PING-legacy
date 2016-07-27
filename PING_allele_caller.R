@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
-ping_caller <- function(
+ping_allele_caller <- function(
 sample.location = "PING_sequences/",
 fastq.pattern.1 = "_1.fastq",
 fastq.pattern.2 = "_2.fastq",

@@ -5,7 +5,7 @@
 ## Add 3DL3
 ## Test MIRA replace by implementing 2DP1, 2DS4, 3DL1S1
 
-ping_grabber <- function(sample.location = "../Sequences/", fastq.pattern.1 = "_R1_001.fastq", fastq.pattern.2 = "_R2_001.fastq", bowtie.threads = 18, threshold.kff = 0.2) {
+ping_extractor <- function(sample.location = "../Sequences/", fastq.pattern.1 = "_R1_001.fastq", fastq.pattern.2 = "_R2_001.fastq", bowtie.threads = 18, threshold.kff = 0.2) {
   
   ping.ready <- function() {
     cat("----- Getting PING_grabber ready -----\n\n")

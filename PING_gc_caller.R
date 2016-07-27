@@ -14,8 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
-#
-ping_gc <- function(
+
+ping_gc_caller <- function(
   run.MIRA = TRUE, 
   run.KFF = TRUE, 
   make.graphs = TRUE, 
