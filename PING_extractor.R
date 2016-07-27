@@ -1,9 +1,19 @@
-#### Upcoming stuff
-## INDEL functionality
-## Code parallel option
-#### This part is going to be much harder than expected, maybe for last
-## Add 3DL3
-## Test MIRA replace by implementing 2DP1, 2DS4, 3DL1S1
+# Copyright 2016 Wesley Marin, Jill Hollenbach, Paul Norman
+#
+# This file is part of PING.
+#
+# PING is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# PING is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
 ping_extractor <- function(sample.location = "../Sequences/", fastq.pattern.1 = "_R1_001.fastq", fastq.pattern.2 = "_R2_001.fastq", bowtie.threads = 18, threshold.kff = 0.2) {
   
