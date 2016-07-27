@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+PING_sequences/*
+PING_sequences
+*.txt
+*.csv
