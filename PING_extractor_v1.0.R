@@ -15,7 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
-ping_extractor <- function(sample.location = "../Sequences/", fastq.pattern.1 = "_R1_001.fastq", fastq.pattern.2 = "_R2_001.fastq", bowtie.threads = 18, threshold.kff = 0.2) {
+ping_extractor <- function(
+  sample.location = "../Sequences/", 
+  fastq.pattern.1 = "_1.fastq.gz", 
+  fastq.pattern.2 = "_2.fastq.gz", 
+  bowtie.threads = 18
+  ) {
   
   ping.ready <- function() {
     cat("----- Getting PING_grabber ready -----\n\n")
@@ -25,22 +30,21 @@ ping_extractor <- function(sample.location = "../Sequences/", fastq.pattern.1 = 
     cat("PING_sequences/ directory created.\n\n")
   }
   
-  ping.mrG <- function() {
+  get_sequence_list <- function(folder.name = sample.location, file.pattern = fastq.pattern.1) {
     
-    get_sequence_list <- function(folder.name = sample.location, file.pattern = fastq.pattern.1) {
-      
-      sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
-      
-      if (is.na(sequence_list[1])) {
-        stop("No sequences found, please place fastq files in the Sequences folder.")
-      } else {
-        sequence_list <- gsub(file.pattern, "", sequence_list)
-        cat(paste("Found sequences: ", paste(sequence_list, collapse = "\n"), sep = "\n"))
-        cat("\n")
-        return(sequence_list)
-      }
+    sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
+    
+    if (is.na(sequence_list[1])) {
+      stop("No sequences found, please place fastq files in the Sequences folder.")
+    } else {
+      sequence_list <- gsub(file.pattern, "", sequence_list)
+      cat(paste("Found sequences: ", paste(sequence_list, collapse = "\n"), sep = "\n"))
+      cat("\n")
+      return(sequence_list)
     }
-    
+  }
+  
+  ping.mrG <- function(sequence.list) {
     
     # Pull out reads that match any KIR ---------------------------------------
     
@@ -59,7 +63,13 @@ ping_extractor <- function(sample.location = "../Sequences/", fastq.pattern.1 = 
       bt2_1 <- paste0("-1 ", sample.location, sequence, fastq.pattern.1)
       bt2_2 <- paste0("-2 ", sample.location, sequence, fastq.pattern.2)
       bt2_stream <- paste0("-S ", sequence, ".temp")
-      bt2_al_conc <- paste0("--al-conc ", "PING_sequences/", sequence, "_KIR_%.fastq")
+      
+      if(is_gz){
+        bt2_al_conc <- paste0("--al-conc-gz ", "PING_sequences/", sequence, "_KIR_%.fastq.gz")
+      }else{
+        bt2_al_conc <- paste0("--al-conc ", "PING_sequences/", sequence, "_KIR_%.fastq")
+      }
+      
       bt2_un <- "--un dump.me"
       
       cat(sequence,"\n\n")
@@ -70,20 +80,21 @@ ping_extractor <- function(sample.location = "../Sequences/", fastq.pattern.1 = 
       file.remove(paste0(sequence, ".temp"))
       file.remove(paste0("dump.me"))
     }
-    
-   
-    sequence_list <- get_sequence_list()
       
-    for(i in 1:length(sequence_list)) {
+    for(sample in sequence.list) {
       cat("\n\nRunning MrGrabWaller on: ")
-      grabber(sequence_list[i])
+      grabber(sample)
     }
     
     cat("MrGrabwaller is complete. Extracted reads are deposited in the Sequences folder.\n")
-    cat("fastq.patterns have been adjusted to _KIR_1.fastq and _KIR_2.fastq.\n")
+    cat("fastq.patterns have been adjusted to _KIR_1.fastq(.gz) and _KIR_2.fastq(.gz).\n")
   }
   
   ping.ready()
   
-  ping.mrG()
+  sequence_list <- get_sequence_list()
+  
+  is_gz <- last(unlist(strsplit(fastq.pattern.1, ".", fixed = T))) == "gz"
+  
+  ping.mrG(sequence_list)
 }

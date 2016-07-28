@@ -17,8 +17,8 @@
 
 ping_allele_caller <- function(
 sample.location = "PING_sequences/",
-fastq.pattern.1 = "_1.fastq",
-fastq.pattern.2 = "_2.fastq",
+fastq.pattern.1 = "_1.fastq.gz",
+fastq.pattern.2 = "_2.fastq.gz",
 bowtie.threads = 18,
 supported.loci = c("2DL1", "2DL23", "2DL4", "2DL5", "2DS3", "2DS4", "2DS5", "2DP1", "3DL1", "3DS1", "3DL2", "3DL3"),
 ping.gc.output = "Combined_results.csv",
@@ -92,22 +92,42 @@ results.directory = ""
   }
   
   # Caps sequences at 120,000 lines
-  cut_fastq <- function(file.name, read.cap, post.file.name) {
-    file_contents <- fread(file.name, sep="\n", nrows = read.cap, header = F)
+  cut_fastq <- function(file.name, read.cap, post.file.name, is.gz) {
+    
+    # Uncompressing if is.gz and moving to post.file.name, this happens one at a time, so space should not be a concern
+    if(is.gz){
+      file_contents <- fread(paste("zcat", file.name), sep="\n", nrows = read.cap, header = F)
+    }else{
+      file_contents <- fread(file.name, sep="\n", nrows = read.cap, header = F)
+    }
+    
     write.table(file_contents, file = post.file.name, quote = F, row.names = F, col.names = F)
   }
   
   # Finds files that are smaller than the recommended size
-  files_too_small <- function(sequence.list){
+  files_too_small <- function(sequence.list, is.gz){
     small_samples <- NA
     
     for(sample in sequence.list){
-      line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, fastq.pattern.1)), stdout = T))
+      
+      # Get the line counts, both for gzip and regular files
+      if(is.gz){
+        line_count <- as.numeric(system2("zcat", c(paste0(sample.location, sample, fastq.pattern.1), "|", "wc", "-l"), stdout = T))
+      }else{
+        line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, fastq.pattern.1)), stdout = T))
+      }
+      
       if(line_count < 280000){
         small_samples <- c(small_samples, paste0(sample.location, sample, fastq.pattern.1))
       }
       
-      line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, fastq.pattern.2)), stdout = T))
+      # Same thing, but for _2 files
+      if(is.gz){
+        line_count <- as.numeric(system2("zcat", c(paste0(sample.location, sample, fastq.pattern.2), "|", "wc", "-l"), stdout = T))
+      }else{
+        line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, fastq.pattern.2)), stdout = T))
+      }
+      
       if(line_count < 280000){
         small_samples <- c(small_samples, paste0(sample.location, sample, fastq.pattern.2))
       }
@@ -131,10 +151,6 @@ results.directory = ""
   
   # Create consensus sequence -- NOT WORKING
   create_consensus <- function(sample, vcf.file, filter.directory, results.directory){
-    vcf.file <- "Results_2016_05_31_12:03/Vcf/DUCAF_S96_L001_KIR_2DL4nuc.vcf"
-    filter.directory <- "Resources/caller_resources/Filters/2DL4/"
-    filter.file <- "2DL4FH5.fas"
-    bed.file <- "2DL4FH5.bed"
     
     
   }
@@ -168,7 +184,7 @@ results.directory = ""
   }
   
   # Counting primer matches to a table
-  count_primer_matches <- function(primer.table, sample) {
+  count_primer_matches <- function(primer.table, sample, is.gz) {
     primer_count_table <- data.frame(matrix(0, nrow=length(primer.table[,1]), ncol=length(sample)))
     rownames(primer_count_table) <- primer.table$Locus
     colnames(primer_count_table) <- sample
@@ -177,11 +193,25 @@ results.directory = ""
     while(counter <= 2) {
       
       if(counter == 1) {
-        cat(paste0(sample, fastq.pattern.1, "\n"))
-        inFile <- paste0(sample, fastq.pattern.1)
+        
+        if(is.gz){
+          cat(paste0(sample, no.gz.pattern.1, "\n"))
+          inFile <- paste0(sample, no.gz.pattern.1)
+        }else{
+          cat(paste0(sample, fastq.pattern.1, "\n"))
+          inFile <- paste0(sample, fastq.pattern.1)
+        }
+
       }else{
-        cat(paste0(sample, fastq.pattern.2, "\n"))
-        inFile <- paste0(sample, fastq.pattern.2)
+        
+        if(is.gz){
+          cat(paste0(sample, no.gz.pattern.2, "\n"))
+          inFile <- paste0(sample, no.gz.pattern.2)
+        }else{
+          cat(paste0(sample, fastq.pattern.2, "\n"))
+          inFile <- paste0(sample, fastq.pattern.2)
+        }
+        
       }
       
       file_contents <- fread(inFile, sep="\n", header=FALSE)
@@ -642,7 +672,7 @@ results.directory = ""
     
     cat("\n")
     cat("Counting primers in: \n")
-    primer_match_table <- count_primer_matches(primer_table, sample)
+    primer_match_table <- count_primer_matches(primer_table, sample, is_gz)
     
     cat("\n")
     cat("Reducing and normalizing primer counts. \n")
@@ -748,8 +778,19 @@ results.directory = ""
   # VCF creation functions
   KIR_2DL1 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is.gz = is_gz)
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     if(!"2DS1" %in% loci.list){
       
@@ -982,6 +1023,8 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL1cons.fastq")))
+    
     
     file.copy(paste0(sequence, "_2DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.1.fastq"))
     file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.2.fastq"))
@@ -1005,8 +1048,20 @@ results.directory = ""
   
   KIR_2DL23 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     
     ## Positive filter
@@ -1301,8 +1356,20 @@ results.directory = ""
   
   KIR_2DL4 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -1410,8 +1477,20 @@ results.directory = ""
   
   KIR_2DL5 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 280000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -1521,8 +1600,20 @@ results.directory = ""
   
   KIR_2DP1 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -1630,8 +1721,20 @@ results.directory = ""
   
   KIR_2DS3 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -1739,8 +1842,20 @@ results.directory = ""
   
   KIR_2DS4 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -1848,8 +1963,20 @@ results.directory = ""
   
   KIR_2DS35 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -1957,8 +2084,20 @@ results.directory = ""
   
   KIR_3DL1 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -2082,8 +2221,20 @@ results.directory = ""
   
   KIR_3DL1S1 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -2293,8 +2444,20 @@ results.directory = ""
 
   KIR_3DS1 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -2435,8 +2598,20 @@ results.directory = ""
   
   KIR_3DL2 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -2543,8 +2718,20 @@ results.directory = ""
   
   KIR_3DL3 <- function(sequence) {
     
-    sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
-    sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
+    if(is_gz){
+      fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
+      fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
+      
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }else{
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
+      cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
+    }
+    
+    
+    #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.1))
+    #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 120000, post.file.name = paste0(sequence, fastq.pattern.2))
     
     bt2_fastq <- "-q"
     bt2_thread_parameter <- paste0("-p", bowtie.threads)
@@ -3227,9 +3414,19 @@ results.directory = ""
   # Find sequences
   sequence_list <- get_sequence_list()
   
-  # Are any sequence files too small?
-  too_small <- files_too_small(sequence_list)
+  # Are the files gzipped?
+  is_gz <- last(unlist(strsplit(fastq.pattern.1, ".", fixed = T))) == "gz"
   
+  # Are any sequence files too small?
+  too_small <- files_too_small(sequence_list, is_gz)
+  
+  # Setting a no.gz fastq pattern
+  if(is_gz){
+    no.gz.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz"))
+    no.gz.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz"))
+  }
+  
+  # Pull in the GC results
   gc_results <- gc.results()
   
   # The master list is the intersection of sample name matches in sequence_list and gc_results
@@ -3322,9 +3519,14 @@ results.directory = ""
       cat(paste("\n---> Finished genotype calling for", sample, "at", current.locus, "<---\n"))
     }
     
-    file.remove(paste0(sample, fastq.pattern.1))
-    file.remove(paste0(sample, fastq.pattern.2))
-    
+    if(is_gz){
+      file.remove(paste0(sample, no.gz.pattern.1))
+      file.remove(paste0(sample, no.gz.pattern.2))
+    }else{
+      file.remove(paste0(sample, fastq.pattern.1))
+      file.remove(paste0(sample, fastq.pattern.2))
+    }
+
     cat(paste("\n\n\n*****---------- Finished with genotype calling for", sample, "----------*****\n\n"))
   }
   

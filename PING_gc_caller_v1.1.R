@@ -28,10 +28,13 @@ ping_gc_caller <- function(
   
   library(data.table)
   
+  # Placing these here instead of in the argument list because MIRA is picky
+  fastq.pattern.1 <- "_1.fastq"
+  fastq.pattern.2 <- "_2.fastq"
   
   # Build sequence list ------------------------------------------------------
   
-  get_sequence_list <- function(folder.name = sample.location, file.pattern = "_1.fastq") {
+  get_sequence_list <- function(folder.name = sample.location, file.pattern = fastq.pattern.1) {
     sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
     if (is.na(sequence_list[1])) {
       stop("No sequences found, please place fastq files in the PING_sequences folder.")
@@ -43,21 +46,35 @@ ping_gc_caller <- function(
   }
   
   # Finds files that are smaller than the recommended size
-  files_too_small <- function(sequence.list){
+  files_too_small <- function(sequence.list, is.gz){
     small_samples <- NA
     
     for(sample in sequence.list){
-      line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, "_1.fastq")), stdout = T))
-      if(line_count < read.cap){
-        small_samples <- c(small_samples, paste0(sample.location, sample, "_1.fastq"))
+      
+      # Get the line counts, both for gzip and regular files
+      if(is.gz){
+        line_count <- as.numeric(system2("zcat", c(paste0(sample.location, sample, fastq.pattern.1), "|", "wc", "-l"), stdout = T))
+      }else{
+        line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, fastq.pattern.1)), stdout = T))
       }
       
-      line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, "_2.fastq")), stdout = T))
       if(line_count < read.cap){
-        small_samples <- c(small_samples, paste0(sample.location, sample, "_2.fastq"))
+        small_samples <- c(small_samples, paste0(sample.location, sample, fastq.pattern.1))
+      }
+      
+      # Same thing, but for _2 files
+      if(is.gz){
+        line_count <- as.numeric(system2("zcat", c(paste0(sample.location, sample, fastq.pattern.2), "|", "wc", "-l"), stdout = T))
+      }else{
+        line_count <- as.numeric(system2("wc", c("-l", "<", paste0(sample.location, sample, fastq.pattern.2)), stdout = T))
+      }
+      
+      if(line_count < read.cap){
+        small_samples <- c(small_samples, paste0(sample.location, sample, fastq.pattern.2))
       }
     }
     
+    # Getting rid of the leading NA from the small sample list
     small_samples <- small_samples[!is.na(small_samples)]
     
     if(length(small_samples) > 0){
@@ -76,8 +93,8 @@ ping_gc_caller <- function(
   filter_sequences <- function(too.small, sequence.list){
     bad_sequences <- unlist(strsplit(too.small, sample.location))
     bad_sequences <- bad_sequences[bad_sequences != ""]
-    bad_sequences <- unlist(strsplit(bad_sequences, "_1.fastq"))
-    bad_sequences <- unlist(strsplit(bad_sequences, "_2.fastq"))
+    bad_sequences <- unlist(strsplit(bad_sequences, fastq.pattern.1))
+    bad_sequences <- unlist(strsplit(bad_sequences, fastq.pattern.2))
     
     bad_sequences <- unique(bad_sequences)
     
@@ -86,10 +103,29 @@ ping_gc_caller <- function(
     return(sequence.list)
   }
   
+  # Find out if the first file is gzipped or not
+  find_gz <- function(sample.location){
+    first_file <- list.files(file.path(sample.location))[1]
+    if(is.na(first_file)){
+      return(FALSE)
+    }else{
+      gz <- last(unlist(strsplit(first_file, ".", fixed = TRUE))) == "gz"
+      return(gz)
+    }
+  }
+  
+  is_gz <- find_gz(sample.location)
+  
+  if(is_gz){
+    fastq.pattern.1 <- "_1.fastq.gz"
+    fastq.pattern.2 <- "_2.fastq.gz"
+  }
+  
   sequence_list <- get_sequence_list()
   
-  too_small <- files_too_small(sequence_list)
-  
+  too_small <- files_too_small(sequence_list, is_gz)
+
+  # Take out everything from sequence_list that is too small  
   if(length(too_small) > 0){
     sequence_list <- filter_sequences(too_small, sequence_list)
   }
@@ -114,8 +150,15 @@ ping_gc_caller <- function(
   }
   
   # Caps sequences at read.cap lines
-  cut_fastq <- function(file.name, read.cap, post.file.name) {
-    file_contents <- fread(file.name, sep="\n", nrows = read.cap, header = F)
+  cut_fastq <- function(file.name, read.cap, post.file.name, is.gz) {
+    
+    # Uncompressing if is.gz and moving to .miraReads, this happens one at a time, so space should not be a concern
+    if(is.gz){
+      file_contents <- fread(paste("zcat", file.name), sep="\n", nrows = read.cap, header = F)
+    }else{
+      file_contents <- fread(file.name, sep="\n", nrows = read.cap, header = F)
+    }
+
     write.table(file_contents, file = post.file.name, quote = F, row.names = F, col.names = F)
   }
   
@@ -124,6 +167,7 @@ ping_gc_caller <- function(
   # Build primer table from forward and reverse primer files
   
   make_primer_table <- function(primerlist.file = "Resources/gc_resources/Primerlist.txt") {
+    
     primer_table = read.delim(primerlist.file, header = FALSE)
     colnames(primer_table) <- c("Locus", "Primer")
     
@@ -135,7 +179,7 @@ ping_gc_caller <- function(
   
   # Counting primer matches to a table
   
-  count_primer_matches <- function(primer.table, sequence.list) {
+  count_primer_matches <- function(primer.table, sequence.list, is.gz) {
     primer_count_table <- data.frame(matrix(0, nrow=length(primer.table[,1]), ncol=length(sequence.list)))
     rownames(primer_count_table) <- primer.table$Locus
     colnames(primer_count_table) <- sequence.list
@@ -145,8 +189,15 @@ ping_gc_caller <- function(
       
       for(i in 1:length(sequence.list)) {
         cat(paste0(sequence.list[i], "_", counter, "\n"))
-        inFile <- paste0(sample.location, sequence.list[i], "_", counter, ".fastq")
-        file_contents <- fread(inFile, sep="\n", nrows = read.cap, header=FALSE)
+        
+        if(is.gz){
+          inFile <- paste0(sample.location, sequence.list[i], "_", counter, ".fastq.gz")
+          file_contents <- fread(paste("zcat", inFile), sep="\n", nrows = read.cap, header=FALSE)
+        }else{
+          inFile <- paste0(sample.location, sequence.list[i], "_", counter, ".fastq")
+          file_contents <- fread(inFile, sep="\n", nrows = read.cap, header=FALSE)
+        }
+        
         file_contents <- file_contents[seq(2, length(file_contents[[1]]), 4)]
         
         for(j in 1:length(primer.table[,"Primer"])) {
@@ -243,7 +294,7 @@ ping_gc_caller <- function(
     
     cat("\n")
     cat("Counting primers in: \n")
-    primer_match_table <- count_primer_matches(primer_table, sequence_list)
+    primer_match_table <- count_primer_matches(primer_table, sequence_list, is_gz)
     
     cat("\n")
     cat("Reducing and normalizing primer counts. \n")
@@ -277,8 +328,8 @@ ping_gc_caller <- function(
     
     for (i in 1:length(sequence.list)) {
       
-      cut_fastq(paste0(sample.location, sequence.list[i], "_1.fastq"), read.cap, paste0(".miraReads/", sequence.list[i], "_1.fastq"))
-      cut_fastq(paste0(sample.location, sequence.list[i], "_2.fastq"), read.cap, paste0(".miraReads/", sequence.list[i], "_2.fastq"))
+      cut_fastq(paste0(sample.location, sequence.list[i], fastq.pattern.1), read.cap, paste0(".miraReads/", sequence.list[i], "_1.fastq"), is_gz)
+      cut_fastq(paste0(sample.location, sequence.list[i], fastq.pattern.2), read.cap, paste0(".miraReads/", sequence.list[i], "_2.fastq"), is_gz)
       
       
       cat(paste0(sequence.list[i], "\n"))
@@ -518,6 +569,12 @@ ping_gc_caller <- function(
       while(!exists("threshold_table")) {
         threshold_table <- create_graphs(normalized_mira_table, threshold.file)
       }
+      
+      thresh_columns <- c("KIR", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+      cat("Writing set thresholds to New_thresholds.csv\n\n")
+      write.table(threshold_table, file = "New_thresholds.txt", quote = F, sep = "\t", na = "", row.names = F, col.names = thresh_columns)
+      write.table(threshold_table, file = paste0(results, "New_thresholds.txt"), quote = F, sep = "\t", na = "", row.names = F, col.names = thresh_columns)
+      
     } else {
       threshold_table <- data.frame(matrix(NA, nrow=15, ncol=11))
       default_table <- read.delim(threshold.file)
