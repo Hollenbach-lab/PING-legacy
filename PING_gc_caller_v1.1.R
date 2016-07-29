@@ -618,15 +618,26 @@ ping_gc_caller <- function(
 
 }
 
-ping_recalc <- function(mira.csv = "MIRA_count_table.csv", threshold.file = "Resources/gc_resources/defaultThresholds.txt", make.graphs = TRUE) {
+ping_recalc <- function(
+  mira.csv = "MIRA_count_table.csv", 
+  threshold.file = "Resources/gc_resources/defaultThresholds.txt", 
+  make.graphs = TRUE,
+  results.directory = ""
+  ) {
   
   results_directory <- function() {
-    save_to <- paste0("GC_results_", format(Sys.time(), "%Y_%m_%d_%H:%M"), "/")
     
-    count <- 1
-    while(file.exists(save_to)) {
-      save_to <- paste0("GC_results_", format(Sys.time(), "%Y_%m_%d_%H:%M"), "_", count, "/")
-      count <- count + 1
+    if(results.directory != ""){
+      save_to <- results.directory
+    }else{
+      
+      save_to <- paste0("GC_results_", format(Sys.time(), "%Y_%m_%d_%H:%M"), "/")
+      
+      count <- 1
+      while(file.exists(save_to)) {
+        save_to <- paste0("GC_results_", format(Sys.time(), "%Y_%m_%d_%H:%M"), "_", count, "/")
+        count <- count + 1
+      }
     }
     
     dir.create(save_to)
@@ -814,7 +825,7 @@ ping_recalc <- function(mira.csv = "MIRA_count_table.csv", threshold.file = "Res
   mira_count_table <- mira_count_table[1: (nrow(mira_count_table) - 1), ]
   
   row.names(mira_count_table) <- mira_count_table[,1]
-  mira_count_table <- mira_count_table[,2:length(mira_count_table[1,])]
+  mira_count_table <- mira_count_table[,2:length(mira_count_table[1,]), drop=FALSE]
   mira_count_table[,1] <- as.numeric(as.character(mira_count_table[,1]))
     
   sequence_list <- colnames(mira_count_table)
