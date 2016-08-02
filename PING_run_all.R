@@ -16,9 +16,9 @@
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
 ping_run_all <- function(
-  sample.location = "../Sequences/",
-  fastq.pattern.1 = "_R1_001.fastq.gz",
-  fastq.pattern.2 = "_R2_001.fastq.gz",
+  sample.location = "/home/wmarin/ncbi/public/files/",
+  fastq.pattern.1 = "_1.fastq.gz",
+  fastq.pattern.2 = "_2.fastq.gz",
   bowtie.threads = 18,
   results.directory = ""
   ){
@@ -68,7 +68,7 @@ ping_run_all <- function(
 
   results <- results_directory()
   
-  ping_gc_caller(sample.location = sample.location, results.directory = results)
+  ping_gc_caller(sample.location = sample.location, results.directory = results, read.cap = 40000)
   
   ping_gc_output <- paste0(results, "Combined_results.csv")
   
