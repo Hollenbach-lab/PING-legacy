@@ -1025,9 +1025,8 @@ results.directory = ""
     
     system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL1cons.fastq")))
     
-    
-    file.copy(paste0(sequence, "_2DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.1.fastq"))
-    file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.2.fastq"))
+    #file.copy(paste0(sequence, "_2DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.1.fastq"))
+    #file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.2.fastq"))
     
     file.copy(paste0(sequence, "_2DL1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL1nuc.vcf"))
     
@@ -1181,9 +1180,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL2cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DL2.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL2.1.fastq"))
-    file.copy(paste0(sequence, "_2DL2.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL2.2.fastq"))
+    #file.copy(paste0(sequence, "_2DL2.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL2.1.fastq"))
+    #file.copy(paste0(sequence, "_2DL2.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL2.2.fastq"))
     
     file.copy(paste0(sequence, "_2DL2nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL2nuc.vcf"))
     
@@ -1239,9 +1239,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL23cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DL23.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL23.1.fastq"))
-    file.copy(paste0(sequence, "_2DL23.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL23.2.fastq"))
+    #file.copy(paste0(sequence, "_2DL23.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL23.1.fastq"))
+    #file.copy(paste0(sequence, "_2DL23.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL23.2.fastq"))
     
     file.copy(paste0(sequence, "_2DL23nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL23nuc.vcf"))
     
@@ -1312,9 +1313,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL3cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DL3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL3.1.fastq"))
-    file.copy(paste0(sequence, "_2DL3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL3.2.fastq"))
+    #file.copy(paste0(sequence, "_2DL3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL3.1.fastq"))
+    #file.copy(paste0(sequence, "_2DL3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL3.2.fastq"))
     
     file.copy(paste0(sequence, "_2DL3nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL3nuc.vcf"))
     
@@ -1454,9 +1456,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL4cons.fastq")))
  
-    file.copy(paste0(sequence, "_2DL4.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL4.1.fastq"))
-    file.copy(paste0(sequence, "_2DL4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL4.2.fastq"))
+    #file.copy(paste0(sequence, "_2DL4.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL4.1.fastq"))
+    #file.copy(paste0(sequence, "_2DL4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL4.2.fastq"))
     
     file.copy(paste0(sequence, "_2DL4nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL4nuc.vcf"))
     
@@ -1577,9 +1580,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL5cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DL5.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.1.fastq"))
-    file.copy(paste0(sequence, "_2DL5.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.2.fastq"))
+    #file.copy(paste0(sequence, "_2DL5.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.1.fastq"))
+    #file.copy(paste0(sequence, "_2DL5.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.2.fastq"))
     
     file.copy(paste0(sequence, "_2DL5nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL5nuc.vcf"))
     
@@ -1698,9 +1702,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DP1cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DP1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DP1.1.fastq"))
-    file.copy(paste0(sequence, "_2DP1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DP1.2.fastq"))
+    #file.copy(paste0(sequence, "_2DP1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DP1.1.fastq"))
+    #file.copy(paste0(sequence, "_2DP1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DP1.2.fastq"))
     
     file.copy(paste0(sequence, "_2DP1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DP1nuc.vcf"))
     
@@ -1819,9 +1824,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS3cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DS3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS3.1.fastq"))
-    file.copy(paste0(sequence, "_2DS3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS3.2.fastq"))
+    #file.copy(paste0(sequence, "_2DS3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS3.1.fastq"))
+    #file.copy(paste0(sequence, "_2DS3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS3.2.fastq"))
     
     file.copy(paste0(sequence, "_2DS3nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS3nuc.vcf"))
     
@@ -1940,9 +1946,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS4cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DS4.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.1.fastq"))
-    file.copy(paste0(sequence, "_2DS4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.2.fastq"))
+    #file.copy(paste0(sequence, "_2DS4.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.1.fastq"))
+    #file.copy(paste0(sequence, "_2DS4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.2.fastq"))
     
     file.copy(paste0(sequence, "_2DS4nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS4nuc.vcf"))
     
@@ -2061,9 +2068,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS35cons.fastq")))
     
-    file.copy(paste0(sequence, "_2DS35.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS35.1.fastq"))
-    file.copy(paste0(sequence, "_2DS35.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS35.2.fastq"))
+    #file.copy(paste0(sequence, "_2DS35.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS35.1.fastq"))
+    #file.copy(paste0(sequence, "_2DS35.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS35.2.fastq"))
     
     file.copy(paste0(sequence, "_2DS35nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS35nuc.vcf"))
     
@@ -2191,8 +2199,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
-    file.copy(paste0(sequence, "_3DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1.1.fastq"))
-    file.copy(paste0(sequence, "_3DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1.2.fastq"))
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL1cons.fastq")))
+    
+    #file.copy(paste0(sequence, "_3DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1.1.fastq"))
+    #file.copy(paste0(sequence, "_3DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1.2.fastq"))
     
     file.copy(paste0(sequence, "_3DL1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL1nuc.vcf"))
     
@@ -2363,8 +2373,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
-    file.copy(paste0(sequence, "_3DL1het.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1het.1.fastq"))
-    file.copy(paste0(sequence, "_3DL1het.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1het.2.fastq"))
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL1hetcons.fastq")))
+    
+    #file.copy(paste0(sequence, "_3DL1het.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1het.1.fastq"))
+    #file.copy(paste0(sequence, "_3DL1het.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1het.2.fastq"))
     
     file.copy(paste0(sequence, "_3DL1hetnuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL1nuc.vcf"))
     
@@ -2406,8 +2418,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
-    file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.1.fastq"))
-    file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.2.fastq"))
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DS1cons.fastq")))
+    
+    #file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.1.fastq"))
+    #file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.2.fastq"))
     
     file.copy(paste0(sequence, "_3DS1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
     
@@ -2566,8 +2580,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
-    file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.1.fastq"))
-    file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.2.fastq"))
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DS1cons.fastq")))
+    
+    #file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.1.fastq"))
+    #file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.2.fastq"))
     
     file.copy(paste0(sequence, "_3DS1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
     
@@ -2696,8 +2712,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
-    file.copy(paste0(sequence, "_3DL2.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL2.1.fastq"))
-    file.copy(paste0(sequence, "_3DL2.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL2.2.fastq"))
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL2cons.fastq")))
+    
+    #file.copy(paste0(sequence, "_3DL2.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL2.1.fastq"))
+    #file.copy(paste0(sequence, "_3DL2.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL2.2.fastq"))
     
     file.copy(paste0(sequence, "_3DL2nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL2nuc.vcf"))
     
@@ -2816,8 +2834,10 @@ results.directory = ""
     system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
     cat("\n")
     
-    file.copy(paste0(sequence, "_3DL3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL3.1.fastq"))
-    file.copy(paste0(sequence, "_3DL3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL3.2.fastq"))
+    system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL3cons.fastq")))
+    
+    #file.copy(paste0(sequence, "_3DL3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL3.1.fastq"))
+    #file.copy(paste0(sequence, "_3DL3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL3.2.fastq"))
     
     file.copy(paste0(sequence, "_3DL3nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL3nuc.vcf"))
     
