@@ -19,7 +19,7 @@ ping_extractor <- function(
   sample.location = "../Sequences/", 
   fastq.pattern.1 = "_1.fastq.gz", 
   fastq.pattern.2 = "_2.fastq.gz", 
-  bowtie.threads = 18
+  bowtie.threads = 4
   ) {
   
   ping.ready <- function() {

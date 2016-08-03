@@ -19,7 +19,7 @@ ping_run_all <- function(
   sample.location = "/home/wmarin/ncbi/public/files/",
   fastq.pattern.1 = "_1.fastq.gz",
   fastq.pattern.2 = "_2.fastq.gz",
-  bowtie.threads = 18,
+  bowtie.threads = 4,
   results.directory = ""
   ){
   

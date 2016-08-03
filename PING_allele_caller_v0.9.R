@@ -19,7 +19,7 @@ ping_allele_caller <- function(
 sample.location = "PING_sequences/",
 fastq.pattern.1 = "_1.fastq.gz",
 fastq.pattern.2 = "_2.fastq.gz",
-bowtie.threads = 18,
+bowtie.threads = 4,
 supported.loci = c("2DL1", "2DL23", "2DL4", "2DL5", "2DS3", "2DS4", "2DS5", "2DP1", "3DL1", "3DS1", "3DL2", "3DL3"),
 ping.gc.output = "Combined_results.csv",
 results.directory = ""
@@ -630,8 +630,8 @@ results.directory = ""
     }
     
     genos.out <- genos.out[1]
-    genos.out[[1]]$X1 <- paste(allele_one, collapse = "/")
-    genos.out[[1]]$X2 <- paste(allele_two, collapse = "/")
+    genos.out[[1]]$X1 <- tryCatch(paste(allele_one, collapse = "/"), error=function(e) "new")
+    genos.out[[1]]$X2 <- tryCatch(paste(allele_two, collapse = "/"), error=function(e) "new")
     
     return(genos.out)
   }
@@ -700,7 +700,7 @@ results.directory = ""
     ###alle calling
     allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 1]),"new")
     allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 1]),"new")
-    poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)))
+    poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors = FALSE)
     poss_genos <- poss_genos[!poss_genos$X1 == "new",]
     poss_genos <- poss_genos[!poss_genos$X2 == "new",]
     
@@ -734,7 +734,7 @@ results.directory = ""
       ## Kff found no results, falling back on the original allele calling method
       allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
       allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")
-      poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)))
+      poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors = FALSE)
       
       error.message <- paste0("\n\nERROR: COULD NOT FIND ADEQUATE KFF MATCHES FOR ", sample, " at ", current.locus, ". FALLING BACK ON NON-KFF ALLELE CALLING.!!\n\n")
       cat(error.message)
@@ -2848,6 +2848,10 @@ results.directory = ""
     
     KIR_sample_snps <- emformat.vcf(x)
     
+    if(is.null(KIR_sample_snps)){
+      return(NULL)
+    }
+    
     reads_pos <- paste0("X", KIR_sample_snps$position)
     
     hmat <- as.matrix(rbind(KIR_sample_snps$snp1call,KIR_sample_snps$snp2call))
@@ -3079,6 +3083,10 @@ results.directory = ""
   # Call possible new alleles from VCF data frame
   new_alleles.vcf <- function(x){
     KIR_sample_snps <- emformat.vcf(x)
+    
+    if(is.null(KIR_sample_snps)){
+      return(NULL)
+    }
     
     reads_pos <- paste0("X", KIR_sample_snps$position)
     
@@ -3316,13 +3324,21 @@ results.directory = ""
     
     genos.out <- lapply(vcf_list.good, allele_call.vcf, sample)
     
+    if(is.null(genos.out)){
+      return(NULL)
+    }
+    
     if(current.locus == "2DL23"){
+      
+      genos.out <- genos.out[!sapply(genos.out, is.null)]
       
       # To make sure new alleles don't break anything
       if(!any(lapply(genos.out, nrow) == 0)){
         
         # Intersecting results
         genos.out <- genos_2DL23(genos.out)
+      }else if(all(lapply(genos.out, nrow)) == 0){
+        return(NULL)
       }
     }
     
@@ -3487,8 +3503,11 @@ results.directory = ""
         ## Determine if 2DL2+ 2DL3+
         # 2DL2+ test
         pos2DL2 <- FALSE
-        vcf_table <- read.table(paste0(results.directory, "Vcf/", sample, "_2DL2nuc.vcf"), header = F)
-        vcf_table <- nodels.vcf(vcf_table)
+        vcf_table <- tryCatch(read.table(paste0(results.directory, "Vcf/", sample, "_2DL2nuc.vcf"), header = F), error=function(e) NULL)
+
+        if(!is.null(vcf_table)){
+          vcf_table <- nodels.vcf(vcf_table)
+        }
         
         if(length(vcf_table[,1]) == 383) {
           pos2DL2 <- TRUE
@@ -3497,8 +3516,11 @@ results.directory = ""
         
         # 2DL3+ test
         pos2DL3 <- FALSE
-        vcf_table <- read.table(paste0(results.directory, "Vcf/", sample, "_2DL3nuc.vcf"), header = F)
-        vcf_table <- nodels.vcf(vcf_table)
+        vcf_table <- tryCatch(read.table(paste0(results.directory, "Vcf/", sample, "_2DL3nuc.vcf"), header = F), error=function(e) NULL)
+        
+        if(!is.null(vcf_table)){
+          vcf_table <- nodels.vcf(vcf_table)
+        }
         
         if(length(vcf_table[,1]) == 386) {
           pos2DL3 <- TRUE
