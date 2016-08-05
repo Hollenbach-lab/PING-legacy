@@ -16,7 +16,7 @@
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
 ping_run_all <- function(
-  sample.location = "/home/wmarin/ncbi/public/files/",
+  sample.location = "Sequences/",
   fastq.pattern.1 = "_1.fastq.gz",
   fastq.pattern.2 = "_2.fastq.gz",
   bowtie.threads = 4,
