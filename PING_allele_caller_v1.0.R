@@ -17,8 +17,8 @@
 
 ping_allele_caller <- function(
   sample.location = "PING_sequences/",
-  fastq.pattern.1 = "_1.fastq.gz",
-  fastq.pattern.2 = "_2.fastq.gz",
+  fastq.pattern.1 = "_1.fastq",
+  fastq.pattern.2 = "_2.fastq",
   bowtie.threads = 4,
   supported.loci = c("2DL1", "2DL23", "2DL4", "2DL5", "2DS3", "2DS4", "2DS5", "2DP1", "3DL1", "3DS1", "3DL2", "3DL3"),
   ping.gc.output = "Combined_results.csv",
