@@ -17,8 +17,8 @@
 
 ping_run_all <- function(
   sample.location = "Sequences/",
-  fastq.pattern.1 = "_1.fastq.gz",
-  fastq.pattern.2 = "_2.fastq.gz",
+  fastq.pattern.1 = "_1.fastq",
+  fastq.pattern.2 = "_2.fastq",
   bowtie.threads = 4,
   results.directory = ""
   ){
