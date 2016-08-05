@@ -23,7 +23,7 @@ ping_run_all <- function(
   results.directory = ""
   ){
   
-  source("PING_allele_caller_v0.9.R")
+  source("PING_allele_caller_v1.0.R")
   source("PING_extractor_v1.0.R")
   source("PING_gc_caller_v1.1.R")
   
