@@ -27,6 +27,8 @@ ping_run_all <- function(
   source("PING_extractor_v1.0.R")
   source("PING_gc_caller_v1.1.R")
   
+  library("data.table")
+  
   # Creates results directory
   results_directory <- function() {
     cat("----- Getting PING ready -----\n\n")
