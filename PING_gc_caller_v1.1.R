@@ -385,8 +385,8 @@ ping_gc_caller <- function(
     default_table <- read.delim(threshold.file)
     threshold_table[,1:length(default_table)] <- default_table
     
+    # Loading KFF results
     if(file.exists(paste0(results, "kff_results.csv"))){
-      # Loading KFF results
       kff_results <- check_kff_results()
     }
     
@@ -394,7 +394,7 @@ ping_gc_caller <- function(
       flag <- 'n'
       
       while(flag == 'n') {
-  
+        
         x_lim <- length(normalized.mira.counts[i,])
         y_lim <- max(normalized.mira.counts[i,]) + 0.2
         
@@ -404,7 +404,6 @@ ping_gc_caller <- function(
         
         ## Making KFF neg results show as red X's
         if(file.exists(paste0(results, "kff_results.csv"))){
-
           # Finding the ordered colnames of mira results
           kff_sample_order <- colnames(normalized.mira.counts)[order(normalized.mira.counts[i,])]
           
@@ -418,13 +417,20 @@ ping_gc_caller <- function(
           # Finding all KFF neg results
           kff_neg_samples <- colnames(kff_locus_results)[grepl(0, kff_locus_results)]
           
+          # Mira values
+          mira_values <- as.numeric(normalized.mira.counts[i, order(normalized.mira.counts[i,])])
+          
+          
           if(length(kff_neg_samples) != 0){
             # Converting these back into MIRA points
-            mira_kff_neg_points <- normalized.mira.counts[i, kff_neg_samples]
+            mira_kff_neg_points <- as.numeric(normalized.mira.counts[i, kff_neg_samples])
+            
+            # X axis values
+            x_vals <- match(mira_kff_neg_points, mira_values)
             
             # Graphing
             par(new = T)
-            plot((1:length(mira_kff_neg_points)), mira_kff_neg_points, ylab = NA, xlab = NA, axes = F, col = "red", pch = 4, xlim = c(1, x_lim), ylim = c(0, y_lim))
+            plot(x_vals, mira_kff_neg_points, ylab = NA, xlab = NA, axes = F, col = "red", pch = 4, xlim = c(1, x_lim), ylim = c(0, y_lim))
           }
         }
         
