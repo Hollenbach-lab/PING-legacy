@@ -22,6 +22,8 @@ ping_extractor <- function(
   bowtie.threads = 4
   ) {
   
+  library(data.table)
+  
   ping.ready <- function() {
     cat("----- Getting PING_grabber ready -----\n\n")
     
