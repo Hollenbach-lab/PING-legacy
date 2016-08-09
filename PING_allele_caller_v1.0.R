@@ -72,7 +72,8 @@ ping_allele_caller <- function(
     sequence_list = list.files(file.path(sample.location), pattern = fastq.pattern.1)
     
     if (is.na(sequence_list[1])) {
-      stop(paste0("No fastq files found in ", sample.location))
+      string <- paste("No sequences found in", sample.location, "using fastq pattern", fastq.pattern.1)
+      stop(string)
     } else {
       sequence_list <- gsub(fastq.pattern.1, "", sequence_list)
       cat(paste("Found sequences: ", paste(sequence_list, collapse = "\n"), sep = "\n"))

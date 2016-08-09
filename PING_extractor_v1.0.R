@@ -37,7 +37,8 @@ ping_extractor <- function(
     sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
     
     if (is.na(sequence_list[1])) {
-      stop("No sequences found, please place fastq files in the Sequences folder.")
+      string <- paste("No sequences found in", sample.location, "using fastq pattern", fastq.pattern.1)
+      stop(string)
     } else {
       sequence_list <- gsub(file.pattern, "", sequence_list)
       cat(paste("Found sequences: ", paste(sequence_list, collapse = "\n"), sep = "\n"))
@@ -88,7 +89,7 @@ ping_extractor <- function(
       grabber(sample)
     }
     
-    cat("MrGrabwaller is complete. Extracted reads are deposited in the Sequences folder.\n")
+    cat("MrGrabwaller is complete. Extracted reads are deposited in the PING_sequences folder.\n")
     cat("fastq.patterns have been adjusted to _KIR_1.fastq(.gz) and _KIR_2.fastq(.gz).\n")
   }
   

@@ -37,7 +37,8 @@ ping_gc_caller <- function(
   get_sequence_list <- function(folder.name = sample.location, file.pattern = fastq.pattern.1) {
     sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
     if (is.na(sequence_list[1])) {
-      stop("No sequences found, please place fastq files in the PING_sequences folder.")
+      string <- paste("No sequences found in", sample.location, "using fastq pattern", file.pattern)
+      stop(string)
     } else {
       sequence_list <- gsub(file.pattern, "", sequence_list)
       cat(paste("Found sequences: ", paste(sequence_list, collapse = "\n"), sep = "\n"))
