@@ -619,7 +619,7 @@ ping_gc_caller <- function(
 }
 
 ping_recalc <- function(
-  mira.csv = "MIRA_count_table.csv", 
+  mira.csv = "MIRA_count_table.csv",
   threshold.file = "Resources/gc_resources/defaultThresholds.txt", 
   make.graphs = TRUE,
   results.directory = ""
@@ -709,13 +709,20 @@ ping_recalc <- function(
           # Finding all KFF neg results
           kff_neg_samples <- colnames(kff_locus_results)[grepl(0, kff_locus_results)]
           
+          # Mira values
+          mira_values <- as.numeric(normalized.mira.counts[i, order(normalized.mira.counts[i,])])
+
+          
           if(length(kff_neg_samples) != 0){
             # Converting these back into MIRA points
-            mira_kff_neg_points <- normalized.mira.counts[i, kff_neg_samples]
+            mira_kff_neg_points <- as.numeric(normalized.mira.counts[i, kff_neg_samples])
+            
+            # X axis values
+            x_vals <- match(mira_kff_neg_points, mira_values)
             
             # Graphing
             par(new = T)
-            plot((1:length(mira_kff_neg_points)), mira_kff_neg_points, ylab = NA, xlab = NA, axes = F, col = "red", pch = 4, xlim = c(1, x_lim), ylim = c(0, y_lim))
+            plot(x_vals, mira_kff_neg_points, ylab = NA, xlab = NA, axes = F, col = "red", pch = 4, xlim = c(1, x_lim), ylim = c(0, y_lim))
           }
         }
         
