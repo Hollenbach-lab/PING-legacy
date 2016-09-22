@@ -314,7 +314,7 @@ ping_gc_caller <- function(
   ## This is an experimental section meant to differentiate kff neg results in MIRA graphs
   check_kff_results <- function(){
     if(file.exists(paste0(results, "kff_results.csv"))){
-      kff_results <- read.csv(paste0(results, "kff_results.csv"))
+      kff_results <- read.csv(paste0(results, "kff_results.csv"), check.names = F)
     }
     
     return(kff_results)
@@ -654,7 +654,7 @@ ping_recalc <- function(
   ## This is an experimental section meant to differentiate kff neg results in MIRA graphs
   check_kff_results <- function(){
     if(file.exists(paste0(old.results, "kff_results.csv"))){
-      kff_results <- read.csv(paste0(old.results, "kff_results.csv"))
+      kff_results <- read.csv(paste0(old.results, "kff_results.csv"), check.names = F)
     }
     
     return(kff_results)
