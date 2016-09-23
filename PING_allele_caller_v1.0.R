@@ -3225,7 +3225,8 @@ ping_allele_caller <- function(
   # Create a master list of samples in both the Sequence folder and PING_gc results
   master.creator <- function(sequence_list, gc_results){
     # Create master list to check against
-    master_list <- sub('\\_.*', '', sequence_list)
+    #master_list <- sub('\\_.*', '', sequence_list)
+    master_list <- sequence_list
     
     # Cutting down master list to only include samples that have been run through PING_gc
     gc_matches <- master_list[pmatch(master_list, colnames(gc_results), nomatch = 0) != 0]
