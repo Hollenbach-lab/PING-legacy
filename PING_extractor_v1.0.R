@@ -102,7 +102,6 @@ ping_extractor <- function(
   sequence_list <- get_sequence_list()
   
   is_gz <- last(unlist(strsplit(fastq.pattern.1, ".", fixed = T))) == "gz"
-  if(debug.mode) cat("\n\nis_gz: ", is_gz)
   
   ping.mrG(sequence_list)
 }
