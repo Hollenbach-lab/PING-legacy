@@ -15,10 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
+
 ping_extractor <- function(
-  sample.location = "Sequences/", 
-  fastq.pattern.1 = "_1.fastq", 
-  fastq.pattern.2 = "_2.fastq", 
+  sample.location = "Sequences/",
+  fastq.pattern.1 = "_1.fastq",
+  fastq.pattern.2 = "_2.fastq",
   bowtie.threads = 4
   ) {
   
@@ -65,7 +66,10 @@ ping_extractor <- function(
       
       bt2_1 <- paste0("-1 ", sample.location, sequence, fastq.pattern.1)
       bt2_2 <- paste0("-2 ", sample.location, sequence, fastq.pattern.2)
+      
+      sequence <- last(unlist(strsplit(sequence, "/")))
       bt2_stream <- paste0("-S ", sequence, ".temp")
+      
       
       if(is_gz){
         bt2_al_conc <- paste0("--al-conc-gz ", "PING_sequences/", sequence, "_KIR_%.fastq.gz")
@@ -98,6 +102,7 @@ ping_extractor <- function(
   sequence_list <- get_sequence_list()
   
   is_gz <- last(unlist(strsplit(fastq.pattern.1, ".", fixed = T))) == "gz"
+  if(debug.mode) cat("\n\nis_gz: ", is_gz)
   
   ping.mrG(sequence_list)
 }

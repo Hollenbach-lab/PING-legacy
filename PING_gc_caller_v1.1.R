@@ -16,12 +16,12 @@
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
 ping_gc_caller <- function(
-  run.MIRA = TRUE, 
-  run.KFF = TRUE, 
-  make.graphs = TRUE, 
-  sample.location = "PING_sequences/", 
-  threshold.file = "Resources/gc_resources/defaultThresholds.txt", 
-  threshold.KFF = 0.2, 
+  run.MIRA = TRUE,
+  run.KFF = TRUE,
+  make.graphs = TRUE,
+  sample.location = "PING_sequences/",
+  threshold.file = "Resources/gc_resources/defaultThresholds.txt",
+  threshold.KFF = 0.2,
   read.cap = 120000,
   results.directory = ""
   ) {
@@ -35,6 +35,7 @@ ping_gc_caller <- function(
   # Build sequence list ------------------------------------------------------
   
   get_sequence_list <- function(folder.name = sample.location, file.pattern = fastq.pattern.1) {
+    
     sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
     if (is.na(sequence_list[1])) {
       string <- paste("No sequences found in", sample.location, "using fastq pattern", file.pattern)
