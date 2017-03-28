@@ -17,8 +17,8 @@
 
 ping_allele_caller <- function(
   sample.location = "PING_sequences/",
-  fastq.pattern.1 = "_1.fastq",
-  fastq.pattern.2 = "_2.fastq",
+  fastq.pattern.1 = "_1.fastq.gz",
+  fastq.pattern.2 = "_2.fastq.gz",
   bowtie.threads = 4,
   supported.loci = c("2DL1", "2DL23", "2DL4", "2DL5", "2DS3", "2DS4", "2DS5", "2DP1", "3DL1", "3DS1", "3DL2", "3DL3"),
   ping.gc.output = "Combined_results.csv",
@@ -28,7 +28,7 @@ ping_allele_caller <- function(
   library(data.table) ## Used for fread
   library(ape) ## Used for read.dna an seg.sites
   library(stringr)
-  source("Resources/locus_functions.R", local=TRUE)
+  source("Resources/locus_functions.R", local = TRUE)
   
   ###################
   # Helper functions --------------------------------------------------------
@@ -152,10 +152,10 @@ ping_allele_caller <- function(
   }
   
   # Create consensus sequence -- NOT WORKING
-  create_consensus <- function(sample, vcf.file, filter.directory, results.directory){
-    
-    
-  }
+  # create_consensus <- function(sample, vcf.file, filter.directory, results.directory){
+  #   
+  #   
+  # }
   
   # Permutates allele codes
   permutator <- function(codes) {
@@ -1164,54 +1164,54 @@ ping_allele_caller <- function(
   }
     
   # VCF creation (single sample)
-  ping.locus <- function(sample, current.locus) {
+  ping.locus <- function(sample, current.locus, is_gz) {
     
     if("2DL1" == current.locus) {
-      KIR_2DL1(sample)
+      KIR_2DL1(sample, is_gz)
     }
     
     if("2DL23" == current.locus) {
-      KIR_2DL23(sample)
+      KIR_2DL23(sample, is_gz)
     }
     
     if("2DL4" == current.locus) {
-      KIR_2DL4(sample)
+      KIR_2DL4(sample, is_gz)
     }
     
     if("2DL5" == current.locus) {
-      KIR_2DL5(sample)
+      KIR_2DL5(sample, is_gz)
     }
     
     if("2DP1" == current.locus) {
-      KIR_2DP1(sample)
+      KIR_2DP1(sample, is_gz)
     }
     
     if("2DS3" == current.locus && !any("2DS35" %in% loci.list)){
-      KIR_2DS3(sample)
+      KIR_2DS3(sample, is_gz)
     }else if("2DS35" == current.locus){
-      KIR_2DS35(sample)
+      KIR_2DS35(sample, is_gz)
     }else if("2DS3" == current.locus){
       
     }
     
     if("2DS4" == current.locus) {
-      KIR_2DS4(sample)
+      KIR_2DS4(sample, is_gz)
     }
     
     if("3DL1" == current.locus && any("3DS1" %in% loci.list)){
-      KIR_3DL1S1(sample)
+      KIR_3DL1S1(sample, is_gz)
     }else if("3DL1" == current.locus){
-      KIR_3DL1(sample)
+      KIR_3DL1(sample, is_gz)
     }else if("3DS1" == current.locus && !any("3DL1" %in% loci.list)){
-      KIR_3DS1(sample)
+      KIR_3DS1(sample, is_gz)
     }
     
     if("3DL2" == current.locus) {
-      KIR_3DL2(sample)
+      KIR_3DL2(sample, is_gz)
     }
     
     if("3DL3" == current.locus) {
-      KIR_3DL3(sample)
+      KIR_3DL3(sample, is_gz)
     }
   }
   
@@ -1314,6 +1314,7 @@ ping_allele_caller <- function(
       genos.wide <- reshape(genos.df, idvar = "sample", timevar="var", direction = "wide")
       genos.wide[is.na(genos.wide)]   <- " "
       
+      # Asterix is used as a marker for conflicting GC results within correctly called allele output files (ex: genos_2DL4.txt)
       if(grepl("_", copy_number)){
         genos.wide[1] <- paste0(genos.wide[1], "*")
       }
@@ -1453,7 +1454,7 @@ ping_allele_caller <- function(
       
       
       # Running the bowtie2 scripts
-      ping.locus(sample, current.locus)
+      ping.locus(sample, current.locus, is_gz)
       
       
       # 2DL23 specific logic
