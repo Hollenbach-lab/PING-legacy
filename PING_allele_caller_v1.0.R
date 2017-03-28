@@ -28,7 +28,7 @@ ping_allele_caller <- function(
   library(data.table) ## Used for fread
   library(ape) ## Used for read.dna an seg.sites
   library(stringr)
-  source("Resources/locus_functions.R")
+  source("Resources/locus_functions.R", local=TRUE)
   
   ###################
   # Helper functions --------------------------------------------------------

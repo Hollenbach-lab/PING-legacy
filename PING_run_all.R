@@ -16,11 +16,11 @@
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
 ping_run_all <- function(
-  sample.location = "Sequences/",
+  sample.location = "../PING_sequences_feb17/",
   fastq.pattern.1 = "_R1_001.fastq.gz",
   fastq.pattern.2 = "_R2_001.fastq.gz",
-  bowtie.threads = 4,
-  results.directory = ""
+  bowtie.threads = 16,
+  results.directory = "../PING_results_feb17/"
   ){
   
   source("PING_allele_caller_v1.0.R")
