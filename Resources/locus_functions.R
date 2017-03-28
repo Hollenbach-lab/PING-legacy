@@ -15,9 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
-
 # VCF creation functions
-KIR_2DL1 <- function(sequence) {
+KIR_2DL1 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -286,7 +285,7 @@ KIR_2DL1 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_2DL23 <- function(sequence) {
+KIR_2DL23 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -597,7 +596,7 @@ KIR_2DL23 <- function(sequence) {
   
 }
 
-KIR_2DL4 <- function(sequence) {
+KIR_2DL4 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -719,7 +718,7 @@ KIR_2DL4 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_2DL5 <- function(sequence) {
+KIR_2DL5 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -843,7 +842,7 @@ KIR_2DL5 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_2DP1 <- function(sequence) {
+KIR_2DP1 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -965,7 +964,7 @@ KIR_2DP1 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_2DS3 <- function(sequence) {
+KIR_2DS3 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1087,7 +1086,7 @@ KIR_2DS3 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_2DS4 <- function(sequence) {
+KIR_2DS4 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1209,7 +1208,7 @@ KIR_2DS4 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_2DS35 <- function(sequence) {
+KIR_2DS35 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1331,7 +1330,7 @@ KIR_2DS35 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_3DL1 <- function(sequence) {
+KIR_3DL1 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1470,7 +1469,7 @@ KIR_3DL1 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_3DL1S1 <- function(sequence) {
+KIR_3DL1S1 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1666,6 +1665,11 @@ KIR_3DL1S1 <- function(sequence) {
   
   file.copy(paste0(sequence, "_3DS1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
   
+  ## Consensus
+  create_consensus <- function(sample, vcf.file, filter.directory, results.directory){
+    
+    create_consesus(paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
+  }
   
   ## Removing files
   file.remove(paste0("r",sequence,"_3DL12in.1.fastq"))
@@ -1697,7 +1701,7 @@ KIR_3DL1S1 <- function(sequence) {
   
 }
 
-KIR_3DS1 <- function(sequence) {
+KIR_3DS1 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1853,7 +1857,7 @@ KIR_3DS1 <- function(sequence) {
   
 }
 
-KIR_3DL2 <- function(sequence) {
+KIR_3DL2 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
@@ -1975,7 +1979,7 @@ KIR_3DL2 <- function(sequence) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-KIR_3DL3 <- function(sequence) {
+KIR_3DL3 <- function(sequence, is_gz) {
   
   if(is_gz){
     fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
