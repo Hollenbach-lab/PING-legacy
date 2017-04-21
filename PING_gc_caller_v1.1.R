@@ -125,12 +125,14 @@ ping_gc_caller <- function(
   
   sequence_list <- get_sequence_list()
   
-  too_small <- files_too_small(sequence_list, is_gz)
-
-  # Take out everything from sequence_list that is too small  
-  if(length(too_small) > 0){
-    sequence_list <- filter_sequences(too_small, sequence_list)
-  }
+  ## THIS NEEDS TO BE UNCOMMENTED
+  
+  # too_small <- files_too_small(sequence_list, is_gz)
+  #  
+  # # Take out everything from sequence_list that is too small  
+  # if(length(too_small) > 0){
+  #   sequence_list <- filter_sequences(too_small, sequence_list)
+  # }
   
   results_directory <- function() {
     

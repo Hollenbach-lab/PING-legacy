@@ -1393,7 +1393,7 @@ ping_allele_caller <- function(
   is_gz <- last(unlist(strsplit(fastq.pattern.1, ".", fixed = T))) == "gz"
   
   # Are any sequence files too small?
-  too_small <- files_too_small(sequence_list, is_gz)
+  #too_small <- files_too_small(sequence_list, is_gz)
   
   # Setting a no.gz fastq pattern
   if(is_gz){

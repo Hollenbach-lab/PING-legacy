@@ -20,6 +20,7 @@ ping_extractor <- function(
   sample.location = "Sequences/",
   fastq.pattern.1 = "_1.fastq",
   fastq.pattern.2 = "_2.fastq",
+  results.directory = "PING_sequences/",
   bowtie.threads = 4
   ) {
   
@@ -28,7 +29,7 @@ ping_extractor <- function(
   ping.ready <- function() {
     cat("----- Getting PING_grabber ready -----\n\n")
     
-    dir.create("PING_sequences", showWarnings = F)
+    dir.create(results.directory, showWarnings = F)
     
     cat("PING_sequences/ directory created.\n\n")
   }
@@ -72,9 +73,9 @@ ping_extractor <- function(
       
       
       if(is_gz){
-        bt2_al_conc <- paste0("--al-conc-gz ", "PING_sequences/", sequence, "_KIR_%.fastq.gz")
+        bt2_al_conc <- paste0("--al-conc-gz ", results.directory, sequence, "_KIR_%.fastq.gz")
       }else{
-        bt2_al_conc <- paste0("--al-conc ", "PING_sequences/", sequence, "_KIR_%.fastq")
+        bt2_al_conc <- paste0("--al-conc ", results.directory, sequence, "_KIR_%.fastq")
       }
       
       bt2_un <- "--un dump.me"
