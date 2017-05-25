@@ -1239,6 +1239,14 @@ ping_allele_caller <- function(
     
     setwd(current_wd)
     
+    # Return NULL if VCF files are empty (VCF files with header info only)
+    for (i in vcf_files) {
+      vcf_test <- tryCatch(read.table(paste0(vcf.location, i), header = F), error=function(e) NULL)
+      if (is.null(vcf_test)){
+        return(NULL)
+      }
+    }
+    
     vcf_list = lapply(paste0(vcf.location, vcf_files), read.table, header = FALSE)
     names(vcf_list) <- vcf_files
     
