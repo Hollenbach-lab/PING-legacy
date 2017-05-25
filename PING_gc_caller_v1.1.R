@@ -630,6 +630,7 @@ ping_gc_caller <- function(
 
 ping_recalc <- function(
   mira.csv = "MIRA_count_table.csv",
+  kff.results.directory = "",
   threshold.file = "Resources/gc_resources/defaultThresholds.txt", 
   make.graphs = TRUE,
   results.directory = ""
@@ -838,7 +839,8 @@ ping_recalc <- function(
   
   mira_count_table <- read.csv(mira.csv, check.names = F)
   
-  old.results <- mira_count_table[nrow(mira_count_table), 2]
+  #old.results <- mira_count_table[nrow(mira_count_table), 2]
+  old.results <- kff.results.directory
   mira_count_table <- mira_count_table[1: (nrow(mira_count_table) - 1), ]
   
   row.names(mira_count_table) <- mira_count_table[,1]
