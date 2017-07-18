@@ -564,6 +564,7 @@ ping_allele_caller <- function(
   }
   
   # Special 2DL23 genotyping
+  # THIS SHOULD BE MOVED TO POST PROCESSING!!
   genos_2DL23 <- function(genos.out){
     
     vector_call_2DL2 <- NA
@@ -638,6 +639,15 @@ ping_allele_caller <- function(
         allele_one <- intersect(one, four)
         allele_two <- intersect(two, three)
       }
+    }
+    
+    
+    ## BUG FIX 7/18 new genotypes were not being caught by the tryCatch because they were character(0), so I am removing objects
+    if(exists("allele_one") && length(allele_one) == 0){
+      remove(allele_one)
+    }
+    if(exists("allele_two") && length(allele_two) == 0){
+      remove(allele_two)
     }
     
     genos.out <- genos.out[1]
