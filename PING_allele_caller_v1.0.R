@@ -1498,7 +1498,8 @@ ping_allele_caller <- function(
       }
       
       # Running the allele calling scripts
-      has_genotype <- ping.caller(sample, current.locus)
+      #has_genotype <- ping.caller(sample, current.locus)
+      has_genotype <- tryCatch(ping.caller(sample, current.locus), error=function(e) NULL)
       
       if(is.null(has_genotype)){
         cat(paste0("\nNo genotype or new alleles found for ", sample, " at ", current.locus, "\n"))
