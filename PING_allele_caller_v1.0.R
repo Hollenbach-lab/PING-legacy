@@ -643,10 +643,10 @@ ping_allele_caller <- function(
     
     
     ## BUG FIX 7/18 new genotypes were not being caught by the tryCatch because they were character(0), so I am removing objects
-    if(length(allele_one) == 0){
+    if(exists("allele_one") && length(allele_one) == 0){
       remove(allele_one)
     }
-    if(length(allele_two) == 0){
+    if(exists("allele_two") && length(allele_two) == 0){
       remove(allele_two)
     }
     
