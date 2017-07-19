@@ -841,7 +841,7 @@ ping_recalc <- function(
   
   #old.results <- mira_count_table[nrow(mira_count_table), 2]
   old.results <- kff.results.directory
-  mira_count_table <- mira_count_table[1: (nrow(mira_count_table) - 1), ]
+  mira_count_table <- mira_count_table[1: nrow(mira_count_table), ]
   
   row.names(mira_count_table) <- mira_count_table[,1]
   mira_count_table <- mira_count_table[,2:length(mira_count_table[1,]), drop=FALSE]
