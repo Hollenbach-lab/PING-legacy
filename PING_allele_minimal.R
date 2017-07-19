@@ -1280,9 +1280,6 @@ ping_allele_caller <- function(
     
     vcf_files.bad <- data.frame(vcf_files[!good])
     
-    print(class(vcf_files.bad))
-    print(current.locus)
-    
     write.table(vcf_files.bad, paste0(results.directory, "KIRcaller/bad_", current.locus, "_files.txt"), append = TRUE, row.names = F, col.names = F, quote = F)
     
     indel_presence <- any(lapply(vcf_list_indels, nrow) > 0)
@@ -1445,7 +1442,7 @@ ping_allele_caller <- function(
     }
     
     if("2DL23" %in% loci.list){
-      loci.list <- c(loci.list, "2DL2")
+      loci.list <- c(loci.list, "2DL2", "2DL3")
     }
     
     # Going backwards from master_list sample name to sequence_list sample name
