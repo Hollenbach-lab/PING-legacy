@@ -36,7 +36,7 @@ ping_extractor <- function(
   
   get_sequence_list <- function(folder.name = sample.location, file.pattern = fastq.pattern.1) {
     
-    sequence_list = list.files(file.path(folder.name), pattern = file.pattern)
+    sequence_list = list.files(file.path(folder.name), pattern = file.pattern, recursive = TRUE)
     
     if (is.na(sequence_list[1])) {
       string <- paste("No sequences found in", sample.location, "using fastq pattern", fastq.pattern.1)
