@@ -1307,6 +1307,7 @@ ping_allele_caller <- function(
       if(current.locus == "2DL23"){
         
         genos.out <- genos.out[!sapply(genos.out, is.null)]
+        genos.out <- genos.out[!sapply(genos.out,nrow) == 0]
         
         # To make sure new alleles don't break anything
         if(!any(lapply(genos.out, nrow) == 0) && length(genos.out) > 1){
