@@ -35,6 +35,7 @@ Sequences/*.fastq
 Results*
 GC_results*
 Caller_results*
+validation_set*
 
 # =========================
 # Operating System Files

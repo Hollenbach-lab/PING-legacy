@@ -32,7 +32,7 @@ KIR_2DL1 <- function(sequence, is_gz) {
   #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is.gz = is_gz)
   #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
   
-  if(!"2DS1" %in% loci.list){
+  if(loci_list$`2DS1` == 0){
     
     # First pos filter
     bt2_fastq <- "-q"
@@ -85,8 +85,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
     cat("\n")
     
   }else{
-    kff_results <- ping.kff(sequence, "2DL1", "Resources/caller_resources/KFF_2DL1.txt", 10)
-    if((kff_results["2DL14and7"] == 1) || (kff_results["2DL14710b"] == 1)){
+    probe_one <- kff_probe_check(probe_list, '*2DL1*4and7')
+    probe_two <- kff_probe_check(probe_list, '*2DL1*4710b')
+    if(probe_one || probe_two){
       
       # First pos filter
       bt2_fastq <- "-q"
@@ -155,7 +156,7 @@ KIR_2DL1 <- function(sequence, is_gz) {
       
       file.remove(paste0(sequence, "_KIR2DL1b.1.fastq"))
       file.remove(paste0(sequence, "_KIR2DL1b.2.fastq"))
-    }else if((kff_results["2DL14and7"] == 0) && (kff_results["2DL14710b"] == 0)){
+    }else if((probe_one == 0) && (probe_two == 0)){
       
       # Pos filter
       bt2_fastq <- "-q"
@@ -263,12 +264,14 @@ KIR_2DL1 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL1cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DL1cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.2.fastq"))
+  #file.copy(paste0(sequence, "_2DL1.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL1.1.fastq"))
+  #file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL1.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DL1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL1nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DL1nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL1nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DL1nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DL1S1in.1.fastq"))
@@ -420,13 +423,14 @@ KIR_2DL23 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL2cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DL2cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DL2.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL2.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL2.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL2.2.fastq"))
+  #file.copy(paste0(sequence, "_2DL2.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL2.1.fastq"))
+  #file.copy(paste0(sequence, "_2DL2.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL2.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DL2nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL2nuc.vcf"))
-  
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DL2nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL2nuc.vcf"), destination_path)
   
   ## 2DL3 alignment
   bt2_score_min <- "--score-min L,0,-0.187"
@@ -479,12 +483,14 @@ KIR_2DL23 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL23cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DL23cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DL23.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL23.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL23.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL23.2.fastq"))
+  #file.copy(paste0(sequence, "_2DL23.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL23.1.fastq"))
+  #file.copy(paste0(sequence, "_2DL23.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL23.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DL23nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL23nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DL23nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL23nuc.vcf"), destination_path)
   
   
   ## Remove 2DL2 tail
@@ -553,13 +559,14 @@ KIR_2DL23 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL3cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DL3cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DL3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL3.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL3.2.fastq"))
+  #file.copy(paste0(sequence, "_2DL3.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL3.1.fastq"))
+  #file.copy(paste0(sequence, "_2DL3.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL3.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DL3nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL3nuc.vcf"))
-  
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DL3nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL3nuc.vcf"), destination_path)
   
   ## Cleanup
   file.remove(paste0(sequence, "_2DL2nuc.vcf"))
@@ -696,12 +703,14 @@ KIR_2DL4 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL4cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DL4cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DL4.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL4.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL4.2.fastq"))
+  #file.copy(paste0(sequence, "_2DL4.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL4.1.fastq"))
+  #file.copy(paste0(sequence, "_2DL4.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL4.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DL4nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL4nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DL4nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL4nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DL4nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DL4in.1.fastq"))
@@ -820,12 +829,14 @@ KIR_2DL5 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL5cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DL5cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DL5.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL5.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.2.fastq"))
+  #file.copy(paste0(sequence, "_2DL5.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL5.1.fastq"))
+  #file.copy(paste0(sequence, "_2DL5.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DL5.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DL5nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL5nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DL5nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL5nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DL5nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DL5in.1.fastq"))
@@ -942,12 +953,15 @@ KIR_2DP1 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DP1cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DP1cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
+
   
-  #file.copy(paste0(sequence, "_2DP1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DP1.1.fastq"))
-  #file.copy(paste0(sequence, "_2DP1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DP1.2.fastq"))
+  #file.copy(paste0(sequence, "_2DP1.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DP1.1.fastq"))
+  #file.copy(paste0(sequence, "_2DP1.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DP1.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DP1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DP1nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DP1nuc.vcf"))
+  file.copy(paste0(sequence, "_2DP1nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DP1nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DP1in.1.fastq"))
@@ -1064,12 +1078,14 @@ KIR_2DS3 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS3cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DS3cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DS3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS3.1.fastq"))
-  #file.copy(paste0(sequence, "_2DS3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS3.2.fastq"))
+  #file.copy(paste0(sequence, "_2DS3.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DS3.1.fastq"))
+  #file.copy(paste0(sequence, "_2DS3.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DS3.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DS3nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS3nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DS3nuc.vcf"))
+  file.copy(paste0(sequence, "_2DS3nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DS3nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DS35in.1.fastq"))
@@ -1186,12 +1202,14 @@ KIR_2DS4 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS4cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DS4cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DS4.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.1.fastq"))
-  #file.copy(paste0(sequence, "_2DS4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.2.fastq"))
+  #file.copy(paste0(sequence, "_2DS4.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DS4.1.fastq"))
+  #file.copy(paste0(sequence, "_2DS4.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DS4.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DS4nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS4nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DS4nuc.vcf"))
+  file.copy(paste0(sequence, "_2DS4nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DS4nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DS4in.1.fastq"))
@@ -1308,12 +1326,14 @@ KIR_2DS35 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS35cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_2DS35cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_2DS35.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS35.1.fastq"))
-  #file.copy(paste0(sequence, "_2DS35.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS35.2.fastq"))
+  #file.copy(paste0(sequence, "_2DS35.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DS35.1.fastq"))
+  #file.copy(paste0(sequence, "_2DS35.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_2DS35.2.fastq"))
   
-  file.copy(paste0(sequence, "_2DS35nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS35nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_2DS35nuc.vcf"))
+  file.copy(paste0(sequence, "_2DS35nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_2DS35nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DS35in.1.fastq"))
@@ -1439,12 +1459,14 @@ KIR_3DL1 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL1cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_3DL1cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_3DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1.1.fastq"))
-  #file.copy(paste0(sequence, "_3DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1.2.fastq"))
+  #file.copy(paste0(sequence, "_3DL1.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL1.1.fastq"))
+  #file.copy(paste0(sequence, "_3DL1.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL1.2.fastq"))
   
-  file.copy(paste0(sequence, "_3DL1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL1nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_3DL1nuc.vcf"))
+  file.copy(paste0(sequence, "_3DL1nuc.vcf"), destination_path)
   
   
   ## Removing files
@@ -1613,12 +1635,14 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL1hetcons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_3DL1S1_L1cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_3DL1het.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1het.1.fastq"))
-  #file.copy(paste0(sequence, "_3DL1het.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL1het.2.fastq"))
+  #file.copy(paste0(sequence, "_3DL1het.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL1het.1.fastq"))
+  #file.copy(paste0(sequence, "_3DL1het.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL1het.2.fastq"))
   
-  file.copy(paste0(sequence, "_3DL1hetnuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL1nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_3DL1S1_L1nuc.vcf"))
+  file.copy(paste0(sequence, "_3DL1hetnuc.vcf"), destination_path)
   
   
   ## 3DS1
@@ -1658,17 +1682,19 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DS1cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_3DL1S1_S1cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.1.fastq"))
-  #file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.2.fastq"))
+  #file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DS1.1.fastq"))
+  #file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DS1.2.fastq"))
   
-  file.copy(paste0(sequence, "_3DS1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_3DL1S1_S1nuc.vcf"))
+  file.copy(paste0(sequence, "_3DS1nuc.vcf"), destination_path)
   
   ## Consensus
-  create_consensus <- function(sample, vcf.file, filter.directory, results.directory){
+  create_consensus <- function(sample, vcf.file, filter.directory, results_directory){
     
-    create_consesus(paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
+    create_consesus(paste0(results_directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
   }
   
   ## Removing files
@@ -1825,12 +1851,14 @@ KIR_3DS1 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DS1cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_3DS1cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.1.fastq"))
-  #file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DS1.2.fastq"))
+  #file.copy(paste0(sequence, "_3DS1.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DS1.1.fastq"))
+  #file.copy(paste0(sequence, "_3DS1.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DS1.2.fastq"))
   
-  file.copy(paste0(sequence, "_3DS1nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DS1nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_3DS1nuc.vcf"))
+  file.copy(paste0(sequence, "_3DS1nuc.vcf"), destination_path)
   
   
   ## Removing files
@@ -1957,12 +1985,14 @@ KIR_3DL2 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL2cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_3DL2cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_3DL2.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL2.1.fastq"))
-  #file.copy(paste0(sequence, "_3DL2.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL2.2.fastq"))
+  #file.copy(paste0(sequence, "_3DL2.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL2.1.fastq"))
+  #file.copy(paste0(sequence, "_3DL2.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL2.2.fastq"))
   
-  file.copy(paste0(sequence, "_3DL2nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL2nuc.vcf"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_3DL2nuc.vcf"))
+  file.copy(paste0(sequence, "_3DL2nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_3DL2nuc.vcf"))
   file.remove(paste0("r",sequence,"_3DL2in.1.fastq"))
@@ -2079,12 +2109,13 @@ KIR_3DL3 <- function(sequence, is_gz) {
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
   
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_3DL3cons.fastq")))
+  destination_path <- file.path(results_directory, 'Fastq', sequence, 'locus', paste0(sequence,"_3DL3cons.fastq"))
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", destination_path))
   
-  #file.copy(paste0(sequence, "_3DL3.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL3.1.fastq"))
-  #file.copy(paste0(sequence, "_3DL3.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_3DL3.2.fastq"))
-  
-  file.copy(paste0(sequence, "_3DL3nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_3DL3nuc.vcf"))
+  #file.copy(paste0(sequence, "_3DL3.1.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL3.1.fastq"))
+  #file.copy(paste0(sequence, "_3DL3.2.fastq"), paste0(results_directory, "Fastq/", sequence, "_3DL3.2.fastq"))
+  destination_path <- file.path(results_directory, 'Vcf', sequence, 'locus', paste0(sequence,"_3DL3nuc.vcf"))
+  file.copy(paste0(sequence, "_3DL3nuc.vcf"), destination_path)
   
   file.remove(paste0(sequence, "_3DL3nuc.vcf"))
   file.remove(paste0("r",sequence,"_3DL3in.1.fastq"))

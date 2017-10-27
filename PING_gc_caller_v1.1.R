@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
+ping_gc_version <- '1.2'
+cat(paste0('PING_gc_caller version: ', ping_gc_version))
+
 ping_gc_caller <- function(
   run.MIRA = TRUE,
   run.KFF = TRUE,
