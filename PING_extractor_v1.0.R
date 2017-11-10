@@ -17,11 +17,11 @@
 
 
 ping_extractor <- function(
-  sample.location = "Sequences/",
-  fastq.pattern.1 = "_1.fastq",
-  fastq.pattern.2 = "_2.fastq",
-  results.directory = "PING_sequences/",
-  bowtie.threads = 4
+  sample.location = "../1_Raw_Data/",
+  fastq.pattern.1 = "R1_001.fastq.gz",
+  fastq.pattern.2 = "R2_001.fastq.gz",
+  results.directory = "../2_Extracted_KIR/",
+  bowtie.threads = 8
   ) {
   
   library(data.table)

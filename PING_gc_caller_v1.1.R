@@ -26,7 +26,7 @@ ping_gc_caller <- function(
   threshold.file = "Resources/gc_resources/defaultThresholds.txt",
   threshold.KFF = 0.2,
   read.cap = 120000,
-  results.directory = ""
+  results.directory = "../3_PING_output/normal_ping/"
   ) {
   
   library(data.table)

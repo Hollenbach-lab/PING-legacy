@@ -22,9 +22,9 @@ ping_locus_aligner <- function(
   sample.location='PING_sequences/',
   fastq.pattern.1 = "_1.fastq.gz",
   fastq.pattern.2 = "_2.fastq.gz",
-  bowtie.threads = 16,
+  bowtie.threads = 4,
   supported.loci = c("2DL1", "2DL23", "2DL4", "2DL5", "2DS3", "2DS4", "2DS5", "2DP1", "3DL1", "3DS1", "3DL2", "3DL3"),
-  results.directory = 'test_results',
+  results.directory = '',
   kff.output = ''
 ){
   source("Resources/locus_functions.R", local = TRUE)
@@ -95,7 +95,7 @@ ping_locus_aligner <- function(
       kff_directory <- kff.output
     }
     
-    cat('Looking for raw_kff_counts in: ', kff_directory)
+    cat('\nLooking for raw_kff_counts in: ', kff_directory)
     kff_directory <- normalizePath(kff_directory)
     
     kff_file <- file.path(kff_directory, 'raw_kff_counts.csv')
@@ -118,7 +118,7 @@ ping_locus_aligner <- function(
       kff_directory <- kff.output
     }
     
-    cat('Looking for kff_results in: ', kff_directory)
+    cat('\nLooking for kff_results in: ', kff_directory)
     kff_directory <- normalizePath(kff_directory)
     
     kff_file <- file.path(kff_directory, 'kff_results.csv')
