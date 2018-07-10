@@ -12,6 +12,7 @@ KIR_allele_assembly/*
 MIRA_log.txt
 *.csv
 *.txt
+*.fastq
 
 # Windows image file caches
 Thumbs.db

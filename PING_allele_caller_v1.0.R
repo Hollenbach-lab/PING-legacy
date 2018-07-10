@@ -282,7 +282,7 @@ ping_allele_caller <- function(
   
   # Allele generation for locus (relies on resource files)
   alleles_gen.vcf <- function(current.locus){
-    all_alleles_preKFF <- read.delim(paste0("Resources/caller_resources/All_", current.locus, "_preKFF.fas"), header=F, colClasses="character")
+    all_alleles_preKFF <- read.delim(paste0("Resources/aligner_resources/All_", current.locus, "_preKFF.fas"), header=F, colClasses="character")
     length_seq <- nchar(all_alleles_preKFF[1,2])
     num_seq <- length(all_alleles_preKFF[,1])
     top_row <- data.frame(cbind(num_seq, length_seq))
@@ -307,7 +307,7 @@ ping_allele_caller <- function(
     
     SOS_locus_lookup <- snps_locus
     
-    KIR_locus_gene_VScDNA <- read.delim(paste0("Resources/caller_resources/KIR", current.locus, "geneVScDNA.txt"))
+    KIR_locus_gene_VScDNA <- read.delim(paste0("Resources/aligner_resources/KIR", current.locus, "geneVScDNA.txt"))
     cdna <- paste0("X", KIR_locus_gene_VScDNA$cDNA)
     gene <- paste0("X", KIR_locus_gene_VScDNA$gene)
     map_pos <- data.frame(cbind(cdna, gene))
@@ -725,7 +725,7 @@ ping_allele_caller <- function(
     poss_genos <- poss_genos[!poss_genos$X1 == "new",]
     poss_genos <- poss_genos[!poss_genos$X2 == "new",]
     
-    kff_legend <- read.delim(paste0("Resources/caller_resources/KIR_", current.locus, "_kff_legend.txt"))
+    kff_legend <- read.delim(paste0("Resources/aligner_resources/KIR_", current.locus, "_kff_legend.txt"))
     kff_types <- kff_legend[grep("KIR", kff_legend[,1], invert=T),]
     kff_legend <- kff_legend[grep("KIR", kff_legend[,1]),]
     
@@ -735,7 +735,7 @@ ping_allele_caller <- function(
     
     
     ## Generate kff results to poss_genos table
-    kff_results <- ping.kff(sample, current.locus, "Resources/caller_resources/2DL49or10_64bit.txt", 10)
+    kff_results <- ping.kff(sample, current.locus, "Resources/aligner_resources/2DL49or10_64bit.txt", 10)
     
     
     ## Get allele codes for kff positive results
@@ -852,7 +852,7 @@ ping_allele_caller <- function(
 
     }else if("2DS4" == current.locus){
       
-      kff_results <- ping.kff(sample, current.locus, "Resources/caller_resources/KFF_2DS4.txt", 10)
+      kff_results <- ping.kff(sample, current.locus, "Resources/aligner_resources/KFF_2DS4.txt", 10)
       
       ###alle calling
       allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
@@ -914,7 +914,7 @@ ping_allele_caller <- function(
       
     }else if("3DL1" == current.locus || "3DS1" == current.locus){
       
-      kff_results <- ping.kff(sample, current.locus, "Resources/caller_resources/KFF_3DL1.txt", 10)
+      kff_results <- ping.kff(sample, current.locus, "Resources/aligner_resources/KFF_3DL1.txt", 10)
       
       ###alle calling
       allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
@@ -923,7 +923,7 @@ ping_allele_caller <- function(
       poss_genos <- poss_genos[!poss_genos$X1 == "new",]
       poss_genos <- poss_genos[!poss_genos$X2 == "new",]
       
-      kff_legend <- read.delim("Resources/caller_resources/KIR_3DL1S1_kff_legend.txt", header = F, fill = T)
+      kff_legend <- read.delim("Resources/aligner_resources/KIR_3DL1S1_kff_legend.txt", header = F, fill = T)
       
       kff_positive <- colnames(kff_results[which(kff_results[1,] == 1)])
       

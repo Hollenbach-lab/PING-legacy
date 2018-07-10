@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
 
-
+ 
 ping_extractor <- function(
   sample.location = "Sequences/",
   fastq.pattern.1 = "_1.fastq",
