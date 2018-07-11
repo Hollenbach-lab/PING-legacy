@@ -34,6 +34,7 @@ ping_allele_caller_dev <- function(
   library(stringr)
   library(digest) ## use for md5 hash algorithm
   source("Resources/locus_functions.R", local = TRUE)
+  source("Resources/haplo_functions.R", local = TRUE)
   source("Resources/caller_functions.R",local = TRUE)
   
   
