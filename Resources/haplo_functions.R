@@ -1,94 +1,3 @@
-## Generate a haplotype bed file (Non-coding) -------------------
-make_bed_full <- function(haplo_directory, allele_list, bed_file_path, ipdkir_gen_df){
-  ## 2DL3 and 3DS1 were guestimates, they might cause problems (11/16/18 WMM)
-  # These are hardcoded exon lengths
-  
-  first=T
-  for(allele in allele_list){
-    current_locus <- unlist(strsplit(allele, '*', fixed=T))[1]
-    current_locus <- unlist(strsplit(current_locus, 'KIR', fixed=T))[2]
-    if(!(current_locus %in% names(exon_lengths))){
-      stop(paste0(allele, ': locus not found in exon_lengths'))
-    }
-    gen_chr_string <- ipdkir_gen_df[allele,]
-    current_locus_allele_frame <- msf_to_allele_frame(haplo_directory, current_locus)
-    
-    exon_list <- c()
-    start <- 0
-    end <- nchar(gen_chr_string)
-    # for(exon_length in exon_lengths[[current_locus]]){
-    #   start <- total_length
-    #   end <- (exon_length+total_length)-1
-    #   current_exon <- current_locus_allele_frame[allele,start:end]
-    #   current_exon <- paste0(current_exon[,names(which(lapply(current_exon, is_nuc) == TRUE))], collapse='')
-    #   exon_list <- c(exon_list, current_exon)
-    #   total_length <- total_length + exon_length
-    #   
-    #   if(str_count(gen_chr_string, current_exon) != 1){
-    #     cat('\n\nDuplication! ', allele, ' ', nchar(current_exon), ' ', current_exon)
-    #     
-    #     known_duplications <- c('KIR3DL3*00101', 'KIR3DL3*00201', 'KIR3DL3*0030101', 'KIR3DS1*0130101', 'KIR3DL3*0090101', 'KIR3DL3*00801', 'KIR3DL3*007',
-    #                             'KIR3DL3*00202', 'KIR3DL3*00206', 'KIR3DL3*00601', 'KIR3DS1*055', 'KIR3DS1*078', 'KIR3DL3*00802', 'KIR3DL3*036',
-    #                             'KIR3DS1*0130108', 'KIR3DL3*005')
-    #     
-    #     if(allele %in% known_duplications & grepl(current_exon, gen_chr_string)){
-    #       cat('\nThis is a known duplication')
-    #     }else{
-    #       stop()
-    #     }
-    #   }
-    # }
-    
-    #exon_position_frame <- data.frame(matrix(nrow=length(exon_lengths[[current_locus]]), ncol=3))
-    
-    allele_position_frame <- data.frame(matrix(nrow = 1,ncol = 3))
-    allele_position_frame[1,] <- c(allele, start,end)
-    #attribute_list <- lapply(exon_list, regexpr, gen_chr_string)
-    #allele_name <- sub(current_locus, paste0('KIR', current_locus), allele)
-    #allele_name <- sub('*', '_', allele_name, fixed=T)
-    
-    ## This section matches exon strings to their position in the allele. In the case of a duplication, the first match after the previous exon is taken.
-    # gen_chr_substr <- gen_chr_string
-    # substr_start <- 1
-    # for(i in 1:length(exon_list)){
-    #   exon <- exon_list[i]
-    # 
-    #   if(nchar(exon) == 0){
-    #     next()
-    #   }
-    #   exon_attributes <- regexpr(exon, gen_chr_substr)
-    #   exon_start <- exon_attributes[1] + substr_start-1
-    #   exon_end <- exon_start + as.integer(attr(exon_attributes, 'match.length'))-1
-    # 
-    #   substr_start <- exon_end
-    #   gen_chr_substr <- substr(gen_chr_string, substr_start, nchar(gen_chr_string))
-    #   exon_position_frame[i,] <- c(allele, exon_start, exon_end)
-    # }
-    # exon_position_frame <- exon_position_frame[!is.na(exon_position_frame[,1]),,drop=F]
-    # exon_position_frame[,'X2'] <- as.integer(exon_position_frame[,'X2']) - 1
-
-    write.table(allele_position_frame, bed_file_path, quote=F, sep=' ', row.names=F, col.names=F, append=!first)
-    first=F
-  }
-}
-
-## --------------------------------------------------------------
-
-
-
-moved_sample_list <- c('IND00008','IND00093','IND00012','IND00014','IND00020','IND00033','IND00045',
-                       'IND00057','IND00069','IND00081','IND00094','IND00026','IND00194')
-
-moved_sample_conversion <- list('IND00012'='IND00014',
-                                'IND00014'='IND00012',
-                                'IND00020'='IND00008',
-                                'IND00033'='IND00020',
-                                'IND00045'='IND00033',
-                                'IND00057'='IND00045',
-                                'IND00069'='IND00057',
-                                'IND00081'='IND00069',
-                                'IND00094'='IND00081')
-
 ## 2DL3 and 3DS1 were guestimates, they might cause problems (11/16/18 WMM)
 # These are hardcoded exon lengths
 exon_lengths <- list('2DL1'=c(34, 36, 300, 294, 51, 102, 53, 177),
@@ -930,6 +839,67 @@ remove_sample_result_directory <- function(results.directory, sample_id){
     file.remove(list.files(dir_path, recursive=T, include.dirs=T, full.names=T))
     file.remove(dir_path)
   }
+}
+
+## Reading in the gc_input.csv file
+read_master_gc <- function(master_gc_path){
+  gc_path <- normalizePath(master_gc_path)
+  gc_table <- read.table(gc_path, sep=',', check.names=F, stringsAsFactors=F, header=T, row.names=1)
+  return(gc_table)
+}
+
+## Reading in the possible haplotype reference alleles
+read_master_haplo <- function(master_haplo_path){
+  haplo_path <- normalizePath(master_haplo_path)
+  haplo_table <- read.table(haplo_path, sep=',', check.names=F, stringsAsFactors=F, header=T, row.names=1)
+  return(haplo_table)
+}
+
+## Read in the list of alleles not to call
+read_blacklist <- function(allele_blacklist_path){
+  blacklist_path <- normalizePath(allele_blacklist_path)
+  blacklist_table <- read.table(blacklist_path, sep=',', check.names=F, stringsAsFactors=F, header=T)
+  return(blacklist_table)
+}
+
+## Determine 2DL2_3 copy number and write gc_input.csv
+prepare_gc_input <- function(raw.kff.file='',combined.csv.file='',results.directory=''){
+  kff_results_table <- read.csv(raw.kff.file, stringsAsFactors = F, check.names = F)
+  combined_table <- read.csv(combined.csv.file, stringsAsFactors = F, check.names = F, row.names = 1)
+  
+  ## only keep sample names that are found in both tables
+  kff_samples <- rownames(kff_results_table)
+  com_samples <- colnames(combined_table)
+  in_both <- intersect(kff_samples,com_samples)
+  
+  kff_results_table <- kff_results_table[in_both,]
+  combined_table <- combined_table[,in_both]
+  
+  bool_index_2DL2 <- unlist(lapply(colnames(kff_results_table), FUN = (function(x) grepl('*2DL2*short', x, fixed=T))))
+  bool_index_2DL3 <- unlist(lapply(colnames(kff_results_table), FUN = (function(x) grepl('*2DL3*2', x, fixed=T))))
+  
+  threshold <- 10
+  weird_samples <- c()
+  for(sample_id in rownames(kff_results_table)){
+    positive_2DL2 <- sum(kff_results_table[sample_id,bool_index_2DL2]) >= threshold
+    positive_2DL3 <- sum(kff_results_table[sample_id,bool_index_2DL3]) >= threshold
+    
+    if(positive_2DL2 & positive_2DL3){
+      combined_table['2DL2',sample_id] <- 1
+      combined_table['2DL3',sample_id] <- 1
+    }else if(positive_2DL2){
+      combined_table['2DL2',sample_id] <- 2
+      combined_table['2DL3',sample_id] <- 0
+    }else if(positive_2DL3){
+      combined_table['2DL2',sample_id] <- 0
+      combined_table['2DL3',sample_id] <- 2
+    }else{
+      combined_table['2DL2',sample_id] <- 0
+      combined_table['2DL3',sample_id] <- 0
+    }
+  }
+  
+  write.csv(t(combined_table), file = file.path(results.directory,'gc_input.csv'), quote = F)
 }
 
 ## Speed-up stuff

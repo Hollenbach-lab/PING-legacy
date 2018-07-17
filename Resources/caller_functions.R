@@ -1112,6 +1112,51 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
 
 
 
+# Format Variable Position SNP information so it can be used for Manual typing
+get_typing.vcf <- function(x, current.locus,DPthresh = 6){
+  KIR_sample_snps <- emformat.vcf(x, DPthresh)
+  reads_pos       <- paste0("X", KIR_sample_snps$position)
+  
+  # Get CDS and Genomic positions
+  # CDS Read Positions (prior to conversion to genomic positions) 
+  SOS_locus_lookup_cds <- read.delim(paste0(results.directory,"KIRcaller/KIR_",current.locus,"_alleles.txt"), sep = " ")
+  reads_pos_cds        <- names(SOS_locus_lookup_cds)
+  reads_pos_cds        <- reads_pos_cds[grepl("X",reads_pos_cds)]
+  reads_pos_genomic    <- names(SOS_locus_lookup)
+  reads_pos_genomic    <- reads_pos_genomic[grepl("X",reads_pos_genomic)]
+  
+  # Conversion Vector: Genomic to CDS positions
+  reads_pos_cds     <- tstrsplit(reads_pos_cds,"X", fixed=T)[[2]]
+  reads_pos_genomic <- tstrsplit(reads_pos_genomic,"X", fixed=T)[[2]]
+  pos_vec_conv        <- reads_pos_cds
+  names(pos_vec_conv) <- reads_pos_genomic
+  
+  KIR_sample_snps$snpcalls <- ifelse(KIR_sample_snps$snp1call == KIR_sample_snps$snp2call, as.character(KIR_sample_snps$snp1call), paste(KIR_sample_snps$snp1call, KIR_sample_snps$snp2call, sep="/"))
+  KIR_sample_snps$cdspos <- pos_vec_conv
+  #codes <- c("A/G","G/A","C/T", "T/C","A/C","C/A","A/T","T/A","C/G","G/C","T/G","G/T")
+  #replacement <- c("R","R","Y","Y","M","M","W","W","S","S","K","K")
+  
+  allcalls.df <- KIR_sample_snps[, c("position", "cdspos","ref","snpcalls")]
+  
+  # Replace Reference call with '-' in last column
+  for(i in row.names(allcalls.df)){
+    snpcall <- allcalls.df[i,4]
+    if (!grepl("/",snpcall)){
+      snpcall <- '-'
+    }
+    allcalls.df[i,4] <- snpcall
+  }
+  
+  position.df <- data.frame(as.numeric(positions))
+  colnames(position.df) <- "position"
+  
+  allpos.df <- merge(position.df, allcalls.df, by = "position", sort = T, all.x = TRUE)
+  
+  allpos.df
+}
+
+
+
 ##==================================================================
 ## PING Allele Caller Functions ------------------------------------
 ##==================================================================
@@ -1934,9 +1979,13 @@ ping.caller <- function (sample, current.locus, DPthresh = 6) {
     write.table(newsnps.df, paste0(results.directory, "KIRcaller/newsnps_", current.locus, ".txt"), row.names=T, col.names=T, quote=F)
   }
   
-  
+  ## Original Format for snps_[LOCUS].txt
   snps.out <- lapply(vcf_list.good, get_calls.vcf, DPthresh=DPthresh)
   snps.df <- as.data.frame(do.call(cbind, snps.out))
+  
+  ## Modified Format for snps_[LOCUS].txt specifically for manual typing
+  
+  ## ----
   
   if(length(snps.df[1,]) > 2) {
     oddcols <- seq(3, ncol(snps.df), by = 2)
