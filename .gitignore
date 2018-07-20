@@ -10,9 +10,9 @@ PING_sequences
 KIR_allele_assembly/*
 .Rhistory
 MIRA_log.txt
-*.csv
 *.txt
 *.fastq
+*table.csv
 
 # Windows image file caches
 Thumbs.db
@@ -32,7 +32,6 @@ $RECYCLE.BIN/
 
 Sequences/*.fastq
 .Rhistory
-*.csv
 Results*
 GC_results*
 Caller_results*

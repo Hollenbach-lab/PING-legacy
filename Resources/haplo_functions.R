@@ -164,7 +164,7 @@ make_bed <- function(haplo_directory, allele_list, bed_file_path, ipdkir_gen_df)
       stop(paste0(allele, ': locus not found in exon_lengths'))
     }
     gen_chr_string <- ipdkir_gen_df[allele,]
-    current_locus_allele_frame <- msf_to_allele_frame(haplo_directory, current_locus)
+    current_locus_allele_frame <- msf_to_allele_frame(msf_directory, current_locus)
     
     exon_list <- c()
     total_length <- 1
@@ -238,13 +238,13 @@ gen_to_chr_vect <- function(haplo_directory, allele){
 }
 
 ## Support funciton for make_bed, this function turns a msf file into a dataframe of aligned alleles
-msf_to_allele_frame <- function(haplo_directory, current_locus){
+msf_to_allele_frame <- function(msf_directory, current_locus){
   if(current_locus == '2DL5A' | current_locus == '2DL5B'){
     old_locus <- current_locus
     current_locus <- '2DL5'
   }
   ## Read in MSF file for current_locus in msf_directory
-  msf_file_path <- file.path(haplo_directory,paste0('KIR',current_locus,'_nuc.msf'))
+  msf_file_path <- file.path(msf_directory,paste0('KIR',current_locus,'_nuc.msf'))
   msf_file <- read.table(msf_file_path, sep='\n', stringsAsFactors = F)
   
   ## Look at the second line, pull out the number of bases following 'MSF: '
@@ -650,6 +650,8 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   ## If there are no het positions, then only call a single allele, no matter what n_alleles is
   if(all(is.na(called_snp_frame[,2]))){
     n_alleles <- 1
+  }else{
+    n_alleles <- 2
   }
   
   possible_allele_frame <- make_unique_pos_frame(possible_allele_frame)
@@ -769,8 +771,8 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
 }
 
 ## Make possible_allele_frame and locus specific vcf result frames to use with the allele_caller function
-allele_caller_input_formatting <- function(current_locus, all_locus_result_frame_list, haplo_directory, allele_blacklist_table){
-  current_locus_allele_frame <- msf_to_allele_frame(haplo_directory, current_locus)
+allele_caller_input_formatting <- function(current_locus, all_locus_result_frame_list, msf_directory, allele_blacklist_table){
+  current_locus_allele_frame <- msf_to_allele_frame(msf_directory, current_locus)
   
   current_locus_allele_frame <- unique(current_locus_allele_frame) ## This eliminates alleles with the same coding sequence
   
@@ -873,7 +875,7 @@ prepare_gc_input <- function(raw.kff.file='',combined.csv.file='',results.direct
   in_both <- intersect(kff_samples,com_samples)
   
   kff_results_table <- kff_results_table[in_both,]
-  combined_table <- combined_table[,in_both]
+  combined_table <- combined_table[,in_both,drop=F]
   
   bool_index_2DL2 <- unlist(lapply(colnames(kff_results_table), FUN = (function(x) grepl('*2DL2*short', x, fixed=T))))
   bool_index_2DL3 <- unlist(lapply(colnames(kff_results_table), FUN = (function(x) grepl('*2DL3*2', x, fixed=T))))
@@ -902,9 +904,561 @@ prepare_gc_input <- function(raw.kff.file='',combined.csv.file='',results.direct
   write.csv(t(combined_table), file = file.path(results.directory,'gc_input.csv'), quote = F)
 }
 
+ping_haplo_aligner_version <- '1.1'
+cat(paste0('PING_haplo_aligner version: ', ping_haplo_aligner_version, '\n'))
+
+ping_haplo_aligner <- function(
+  sample.location='',
+  fastq.pattern.1 = "_1.fastq.gz",
+  fastq.pattern.2 = "_2.fastq.gz",
+  bowtie.threads = 4,
+  results.directory = '',
+  sample.name = '',
+  sample.haplotype = haplo_1,
+  ipdkir_allele_df = ipdkir_allele_df,
+  ipdkir_nuc_df = ipdkir_nuc_df,
+  haplo.iteration=1
+){
+  library(data.table)
+  library(stringr)
+  source("Resources/haplo_functions.R", local = TRUE)
+  
+  haplo_resources_directory <- normalizePath(haplo_resources_directory, mustWork=T)
+  
+  # Creates results directory, defaults to Aligner_results
+  create_results_directory <- function() {
+    cat("----- Getting PING ready -----\n\n")
+    cat(paste0("Current working directory: ", getwd(), '\n\n'))
+    
+    if(results.directory != ""){
+      save_to <- results.directory
+    }else{
+      save_to <- paste0("Haplo_aligner_results_", format(Sys.time(), "%Y_%m_%d_%H_%M"), "/")
+      
+      count <- 1
+      while(file.exists(save_to)) {
+        save_to <- paste0("Haplo_aligner_results_", format(Sys.time(), "%Y_%m_%d_%H_%M"), "_", count, "/")
+        count <- count + 1
+      }
+    }
+    dir.create(file.path(save_to), showWarnings = F)
+    save_to <- normalizePath(save_to)
+    
+    cat(paste("Results being saved to", save_to, "\n\n"))
+    
+    return(save_to)
+  }
+  
+  # Creates results folders
+  ping_ready <- function(current_sample, results_directory) {
+    
+    dir.create(file.path(results_directory), showWarnings = F)
+    dir.create(file.path(results_directory, "Vcf"), showWarnings = F)
+    dir.create(file.path(results_directory, "Fastq"), showWarnings = F)
+    dir.create(file.path(results_directory, "Haplo_reference"), showWarnings=F)
+    
+    sample <- current_sample
+    dir.create(file.path(results_directory, 'Vcf', sample), showWarnings=F)
+    dir.create(file.path(results_directory, 'Vcf', sample, 'locus'), showWarnings=F)
+    dir.create(file.path(results_directory, 'Vcf', sample, 'haplo'), showWarnings=F)
+    dir.create(file.path(results_directory, 'Fastq', sample), showWarnings=F)
+    dir.create(file.path(results_directory, 'Fastq', sample, 'locus'), showWarnings=F)
+    dir.create(file.path(results_directory, 'Fastq', sample, 'haplo'), showWarnings=F)
+    dir.create(file.path(results_directory, 'Haplo_reference', sample), showWarnings=F)
+    
+    cat("\n\nResults subdirectories created.\n\n")
+  }
+  
+  # Create next reference iteration directory
+  create_new_iteration_directory <- function(sample, results_directory, haplo_iteration = 1) {
+    ## Finding how many haplotype reference iterations have been performed for a specific sample
+    ## and creating a new directory for the next iteration
+    
+    haplo_ref_path <- file.path(results_directory, 'Haplo_reference', sample)
+    haplo_dirs <- list.dirs(haplo_ref_path, recursive=F, full.names=F)
+    
+    #if(length(haplo_dirs) == 0){
+    #  haplo_iteration <- 1
+    #}else{
+    #  haplo_iteration_raw <- tstrsplit(haplo_dirs, '_')[[2]]
+    #  haplo_iteration <- max(as.integer(haplo_iteration_raw)) + 1
+    #}
+    
+    save_to <- file.path(results_directory, 'Haplo_reference', sample, paste0('reference_', haplo_iteration))
+    if (dir.exists(save_to)){
+      unlink(save_to,recursive = T)
+    }
+    dir.create(save_to, showWarnings=F)
+    
+    iteration_filepath <- normalizePath(save_to)
+    return(list(filepath = iteration_filepath, iteration = haplo_iteration))
+  }
+  
+  # Finds sequences
+  get_sample <- function() {
+    
+    # This is the non-recursive version
+    sample_list = list.files(file.path(sample.location), pattern = sample.name)
+    
+    if (is.na(sample_list[1])) {
+      string <- paste("No sequences found in", sample.location, "using ", sample.name)
+      stop(string)
+    } else {
+      
+      if(!any(grepl(fastq.pattern.1, sample_list, fixed=T))){
+        string <- paste0("Fastq pattern ", fastq.pattern.1, " not found in ", sample_list[1])
+        stop(string)
+      }
+      if(!any(grepl(fastq.pattern.1, sample_list, fixed=T))){
+        string <- paste0("Fastq pattern ", fastq.pattern.2, " not found in ", sample_list[2])
+        stop(string)
+      }
+      
+      sample_list <- gsub(fastq.pattern.1, "", sample_list)
+      sample_list <- gsub(fastq.pattern.2, "", sample_list)
+      sample_list <- unique(sample_list)
+      cat(paste("Found sequences: ", paste(sample_list, collapse = "\n"), sep = "\n"))
+      cat("\n")
+      return(sample_list)
+    }
+  }
+  
+  ### Aligns Sample to Haplotype reference
+  align_to_haplo_ref <- function(fasta_path, bed_file, sequence, iteration){
+    ### 1. Align KIR extracted reads to haplo-reference
+    bt2_p <- paste0("-p", bowtie.threads)
+    bt2_5 <- "-5 3"
+    bt2_3 <- "-3 7"
+    #bt2_L <- "-L 20"
+    bt2_i <- "-i S,1,0.5"
+    bt2_min_score <- "--score-min L,0,-0.187"
+    bt2_I <- "-I 75"
+    bt2_X <- "-X 1000"
+    
+    bt_index_path <- substr(fasta_path, 1, (nchar(fasta_path)-6))
+    bt2_x <- paste0("-x ", bt_index_path)
+    
+    bt2_1 <- paste0("-1 ", file.path(sample.location, paste0(sequence, fastq.pattern.1)))
+    bt2_2 <- paste0("-2 ", file.path(sample.location, paste0(sequence, fastq.pattern.2)))
+    
+    sequence  <- last(unlist(strsplit(sequence, "/")))
+    sam_file   <- paste0(sequence, ".haplo.sam")  # SAM output file path
+    bt2_stream <- paste0("-S ", sam_file)    
+    
+    
+    bt2_al_conc <- paste0("--al-conc-gz ", sequence, "_%.fastq.gz")
+    
+    bt2_un <- "--un dump.me"
+    
+    cat('\n\n', sequence,"\n\n")
+    cat("bowtie2", bt2_p, bt2_5, bt2_3, bt2_i, bt2_min_score, bt2_I, bt2_X, bt2_x, bt2_1, bt2_2, bt2_stream, bt2_al_conc, bt2_un)
+    system2("bowtie2", c(bt2_p, bt2_5, bt2_3, bt2_i, bt2_min_score, bt2_I, bt2_X, bt2_x, bt2_1, bt2_2, bt2_stream, bt2_al_conc, bt2_un))
+    cat("\n\n")
+    
+    #file.remove(paste0(sequence, ".temp"))
+    file.remove(paste0("dump.me"))
+    
+    
+    ### 2. Convert SAM to BAM file
+    samt_param <- "-b -q10 "
+    bam_file <- paste0(sequence, ".haplo.bam")  # BAM output file
+    samt_out <- paste0("-o ", bam_file)
+    cat("samtools view", samt_param, sam_file, samt_out)
+    system2("samtools", c("view",samt_param, sam_file, samt_out))
+    cat("\n\n")
+    
+    ### 3. Sort BAM file
+    samt_T <- "-T temp "
+    sorted_bam_file <- paste0(sequence, ".haplo.sorted.bam")  # Sorted BAM output file
+    samt_out_sorted <- paste0("-o ", sorted_bam_file)
+    cat("samtools sort", samt_out_sorted, samt_T, bam_file)
+    system2("samtools", c("sort", samt_out_sorted, samt_T, bam_file))
+    cat("\n\n")
+    
+    ### 4. Generate VCF file
+    mp_m <- "-m 3"
+    mp_F <- "-F 0.0002"
+    mp_u <- "-u "
+    mp_f <- paste0("-f ", fasta_path)
+    mp_l <- paste0("-l ", bed_file)
+    vcf_filepath <- file.path(results_directory, 'Vcf', sequence, 'haplo', paste0(sequence, '.reference_', iteration, '.vcf'))
+    mp_o <- paste0("-o ", vcf_filepath)
+    mp_O <- "-O v"
+    
+    cat("samtools", "mpileup", mp_m, mp_u, mp_F, mp_f, sorted_bam_file, mp_l, "|", "bcftools", "call", "--multiallelic-caller", mp_O, mp_o)
+    system2("samtools", c("mpileup", mp_m, mp_u, mp_F, mp_f, sorted_bam_file, mp_l, "|", "bcftools", "call", "--multiallelic-caller", mp_O, mp_o))
+    cat("\n\n")
+    
+    
+    file.remove(paste0(sequence,'_1.fastq.gz'))
+    file.remove(paste0(sequence,'_2.fastq.gz'))
+    file.remove(bam_file)
+    file.remove(sam_file)
+    file.remove(sorted_bam_file)
+    
+    
+    return(vcf_filepath)
+  }
+  
+  results_directory <- create_results_directory()
+  current_sample <- get_sample()
+  ping_ready(current_sample, results_directory)
+  
+  # Generate ipd_kir allele dataframe
+  kir_gen_path <- file.path(ipd_kir_resources_directory, 'KIR_gen.fasta')
+  kir_nuc_path <- file.path(ipd_kir_resources_directory, 'KIR_nuc.fasta')
+  
+  ## SPEED UP
+  #ipdkir_allele_df <- get_ipdkir_allele_df(kir_gen_path)
+  #ipdkir_nuc_df <- get_ipdkir_allele_df(kir_nuc_path)
+  
+  ## Generate iteration directory
+  sample_haplo_iteration_list <- create_new_iteration_directory(current_sample, results_directory, haplo_iteration = haplo.iteration)
+  haplo_ref_filepath <- file.path(sample_haplo_iteration_list$filepath, paste0(current_sample, '.haplo.fasta'))
+  
+  ## THIS FUNCTION INCORPORATES SINK
+  generate_haplo_ref(sample.haplotype,ipdkir_allele_df, haplo_ref_filepath)
+  
+  ## Build Bowtie2 reference
+  haplo_bowtie_index <- substr(haplo_ref_filepath, 1, nchar(haplo_ref_filepath)-6)
+  system2("bowtie2-build", c(haplo_ref_filepath, haplo_bowtie_index))
+  
+  ## Make the bed file
+  bed_filepath <- file.path(sample_haplo_iteration_list$filepath, paste0(current_sample, '.haplo.bed'))
+  make_bed(haplo_resources_directory, sample.haplotype, bed_filepath, ipdkir_allele_df)
+  
+  ## Haplotype alignment
+  vcf_filepath <- align_to_haplo_ref(haplo_ref_filepath, bed_filepath, current_sample, haplo.iteration)
+  cat('\n\nAll finished!')
+}
+
+ping_haplo_caller_version <- '1.0'
+cat(paste0('PING_haplo_caller version: ', ping_haplo_caller_version, '\n'))
+ping_haplo_caller <- function(
+  sample.name = '',
+  results.directory = '',
+  ipdkir_allele_df = ipdkir_allele_df,
+  ipdkir_nuc_df = ipdkir_nuc_df
+){
+  library(data.table)
+  library(stringr)
+  source("Resources/haplo_functions.R", local = TRUE)
+  
+  vcf_threshold = 0.1
+  allele_threshold = 0.85
+  
+  results_directory <- normalizePath(results.directory, mustWork=T)
+  
+  # Finds sequence names
+  get_full_sample_name <- function(sample_name, results_directory) {
+    dir_list <- list.dirs(file.path(results_directory, 'Vcf'), full.names=F, recursive=F)
+    if(length(dir_list) == 0){
+      cat('\n\nNo sample directories were found in: ', results_directory)
+      stop()
+    }
+    
+    sample_index <- grep(sample_name, dir_list, fixed=T)
+    
+    if(length(sample_index) > 1){
+      cat('\n\nMore than 1 directory matched: ', sample_name)
+      stop()
+    }else if(length(sample_index) == 0){
+      cat('\n\nNo directories matched: ', sample_name)
+      stop()
+    }
+    
+    return(dir_list[sample_index])
+  }
+  
+  call_alt_allele <- function(frame_allele_unique, vcf_frame){
+    frame_allele_unique_updated <- frame_allele_unique
+    vcf_frame <- filter_vcf_frame(vcf_frame, vcf_threshold)
+    ref_allele <- vcf_frame[1,1]
+    cat('\n\nRef allele: ', ref_allele)
+    
+    geno_bad_calls <- which(tstrsplit(vcf_frame$V10, ':')[[1]] == '1/1')
+    
+    if(length(geno_bad_calls)){
+      cat('\n\nBad reference detected: ', ref_allele)
+      #stop()
+    }
+    
+    alt_pos_list <- which(vcf_frame$V5 != '.')
+    alt_pos_list <- rownames(vcf_frame[alt_pos_list,])
+    no_alt=F
+    if(length(alt_pos_list) == 0){
+      cat('\n\nNo alt calls found.')
+      no_alt=T
+    }else{
+      cat('\n\n', length(alt_pos_list), ' alt calls found.')
+    }
+    
+    ## Iterate through all alt calls
+    for(current_pos in alt_pos_list){
+      
+      current_nuc <- vcf_frame[current_pos, 'V5']
+      
+      if(current_pos %in% colnames(frame_allele_unique_updated)){
+        matched_alleles <- which(frame_allele_unique_updated[,current_pos] == current_nuc)
+        frame_allele_unique_updated <- make_unique_pos_frame(frame_allele_unique_updated[matched_alleles,,drop=F])
+      }else{
+        ## Making sure cut out positions still match the nuc call
+        sub_matched_alleles <- rownames(frame_allele_unique_updated)
+        if(!all(frame_allele_unique[sub_matched_alleles, current_pos] == current_nuc)){
+          frame_allele_unique_updated <- frame_allele_unique
+          cat('\n\nCut position does not match SNP call.')
+          break()
+        }
+      }
+      
+      if(nrow(frame_allele_unique_updated) == 0){
+        cat('\n\nAll alleles dropped when trying to match.')
+      }
+    }
+    
+    ## First condition: No alt calls found
+    
+    if(no_alt){
+      alleles_to_return <- list(primary=c(ref_allele), secondary=c())
+    }else if(ncol(frame_allele_unique_updated) == 0){
+      
+      ## Second condition: Alt calls perfectly match an allele/s
+      
+      cat('\n\nPerfectly matched alt allele.')
+      #alleles_to_return <- rownames(frame_allele_unique_updated)
+      alleles_to_return <- list(primary=rownames(frame_allele_unique_updated), secondary=c())
+    }else{
+      
+      ## Third condition: Ref and Alt calls will be matched to closest allele
+      
+      cat('\n\nFinding closest matching alt alleles.')
+      snp_pos <- colnames(frame_allele_unique_updated)
+      snp_nuc <- vcf_frame[snp_pos, 'V4']
+      
+      snp_frame <- data.frame(matrix(nrow=1, ncol=length(snp_pos)), row.names = c('SNP'))
+      colnames(snp_frame) <- snp_pos
+      snp_frame['SNP',] <- snp_nuc
+      
+      ## Bringing in ALT calls instead of only having REF calls
+      alt_snp_list <- alt_pos_list[alt_pos_list %in% snp_pos]
+      if(length(alt_snp_list) > 0){
+        snp_frame['SNP',alt_snp_list] <- vcf_frame[alt_snp_list,'V5']
+      }
+      
+      ## Drop na's
+      snp_frame <- snp_frame[,!is.na(snp_frame), drop=F]
+      frame_allele_unique_updated <- frame_allele_unique_updated[,colnames(snp_frame),drop=F]
+      
+      allele_distance_list <- find_allele_distances_from_snps(snp_frame, frame_allele_unique_updated)
+      
+      closest_alleles <- names(which(allele_distance_list$distance_list == allele_distance_list$min_distance))
+      other_alleles <- names(which(allele_distance_list$distance_list > allele_distance_list$min_distance))
+      
+      min_distance <- allele_distance_list$min_distance
+      
+      cat('\n\nClosest allele distance: ', min_distance)
+      cat('\nClosest alleles: ', closest_alleles)
+      if(length(other_alleles) > 0){
+        second_min_distance <- min(allele_distance_list$distance_list[other_alleles])
+        second_closest_alleles <- names(which(allele_distance_list$distance_list == second_min_distance))
+        cat('\n\nSecond closest allele distance: ', second_min_distance)
+        cat('\nSecond closest alleles: ', second_closest_alleles)
+        alleles_to_return <- list(primary=closest_alleles, secondary=second_closest_alleles)
+      }else{
+        cat('\n\nNo secondary alleles.')
+        alleles_to_return <- list(primary=closest_alleles, secondary=c())
+      }
+    }
+    
+    return(alleles_to_return)
+  }
+  
+  call_not_allele <- function(frame_allele_unique, vcf_frame){
+    frame_allele_unique_updated <- frame_allele_unique
+    ref_allele <- vcf_frame[1,1]
+    cat('\n\nIncorrect ref allele: ', ref_allele)
+    
+    geno_bad_calls <- which(tstrsplit(vcf_frame$V10, ':')[[1]] == '1/1')
+    bad_ref_pos_list <- rownames(vcf_frame[geno_bad_calls,])
+    
+    for(current_pos in bad_ref_pos_list){
+      current_nuc <- vcf_frame[current_pos, 'V4']
+      
+      if(current_pos %in% colnames(frame_allele_unique_updated)){
+        matched_alleles <- which(frame_allele_unique_updated[,current_pos] != current_nuc)
+        frame_allele_unique_updated <- make_unique_pos_frame(frame_allele_unique_updated[matched_alleles,,drop=F])
+      }else{
+        ## Making sure cut out positions still match the nuc call
+        sub_matched_alleles <- rownames(frame_allele_unique_updated)
+        if(!all(frame_allele_unique[sub_matched_alleles, current_pos] != current_nuc)){
+          stop('\n\nCut position does not match SNP call.')
+        }else{
+          cat('\n\nCut positions all match SNP call!')
+        }
+      }
+    }
+    
+    geno_alt_calls <- which(tstrsplit(vcf_frame$V10, ':')[[1]] == '0/1')
+    alt_call_list <- rownames(vcf_frame[geno_alt_calls,])
+    
+    for(current_pos in alt_call_list){
+      ref_nuc <- vcf_frame[current_pos, 'V4']
+      alt_nuc <- vcf_frame[current_pos, 'V5']
+      
+      current_nuc_list <- c(ref_nuc, alt_nuc, '.')
+      
+      if(current_pos %in% colnames(frame_allele_unique_updated)){
+        matched_alleles <- which(frame_allele_unique_updated[,current_pos] %in% current_nuc_list)
+        frame_allele_unique_updated <- make_unique_pos_frame(frame_allele_unique_updated[matched_alleles,,drop=F])
+      }
+    }
+    
+    
+    if(ncol(frame_allele_unique_updated) == 0){
+      cat('\n\nPerfectly matched alt reference allele.')
+      alleles_to_return <- rownames(frame_allele_unique_updated)
+    }else{
+      cat('\n\nFinding closest matching alt reference alleles.')
+      snp_pos <- colnames(frame_allele_unique_updated)
+      snp_nuc <- vcf_frame[snp_pos, 'V4']
+      
+      snp_frame <- data.frame(matrix(nrow=1, ncol=length(snp_pos)), row.names = c('SNP'))
+      colnames(snp_frame) <- snp_pos
+      snp_frame['SNP',] <- snp_nuc
+      
+      ## Drop na's
+      snp_frame <- snp_frame[,!is.na(snp_frame), drop=F]
+      frame_allele_unique_updated <- frame_allele_unique_updated[,colnames(snp_frame),drop=F]
+      
+      allele_distance_list <- find_allele_distances_from_snps(snp_frame, frame_allele_unique_updated)
+      
+      closest_alleles <- names(which(allele_distance_list$distance_list == allele_distance_list$min_distance))
+      min_distance <- allele_distance_list$min_distance
+      
+      cat('\n\nClosest allele distance: ', min_distance)
+      alleles_to_return <- closest_alleles
+    }
+    cat('\n\nReturning possible alterative references.')
+    return(alleles_to_return)
+  }
+  
+  compare_Vcf_and_Haplo_reference <- function(vcf_directory, iteration_dir_list){
+    both_are_same = TRUE
+    
+    num_of_vcf_files <- length(list.files(vcf_directory))
+    
+    if(length(iteration_dir_list) != num_of_vcf_files){
+      both_are_same = FALSE
+    }
+    
+    return(both_are_same)
+  }
+  
+  ## Sample manipulation and setup
+  sample_name <- get_full_sample_name(sample.name, results_directory)
+  reference_directory <- normalizePath(file.path(results_directory, 'Haplo_reference', sample_name), mustWork=T)
+  vcf_directory <- normalizePath(file.path(results_directory, 'Vcf', sample_name, 'haplo'), mustWork=T)
+  iteration_dir_list <- list.dirs(file.path(results_directory, 'Haplo_reference', sample_name), recursive=F, full.names=F)
+  
+  ######
+  # HARD RETURN IF NUMBER OF VCF FILES != NUMBER OF HAPLO REFERENCES
+  sample_must_pass_this_checkpoint <- compare_Vcf_and_Haplo_reference(vcf_directory, iteration_dir_list)
+  if(!sample_must_pass_this_checkpoint){
+    return("DID NOT PASS")
+  }
+  #####
+  # all good from here on out :)
+  
+  iteration_numbers <- as.integer(tstrsplit(iteration_dir_list, '_')[[2]])
+  iteration_dir_list <- iteration_dir_list[order(iteration_numbers)]
+  
+  all_allele_calling_frame_list <- list()
+  for(iteration_dir in iteration_dir_list){
+    cat('\n\nReading in files from: ', iteration_dir)
+    result_frame_list <- list()
+    allele_frame_list <- list()
+    allele_call_list <- list()
+    allele_vcf_full_list <- list()
+    
+    bed_filepath <- file.path(reference_directory, iteration_dir, paste0(sample_name, '.haplo.bed'))
+    bed_filepath <- normalizePath(bed_filepath, mustWork=T)
+    
+    ## Getting an allele list from the bed file
+    haplo_allele_list <- get_haplo_allele_list(bed_filepath)
+    
+    ## Formatting the allele list to get a locus list
+    haplo_locus_list <- tstrsplit(haplo_allele_list, '*', fixed=T)[[1]]
+    haplo_locus_list <- tstrsplit(haplo_locus_list, 'KIR')[[2]]
+    
+    ## Find VCF filepath
+    vcf_filepath <- file.path(vcf_directory, paste0(sample_name, '.', iteration_dir, '.vcf'))
+    vcf_filepath <- normalizePath(vcf_filepath, mustWork=T)
+    
+    ## Read in VCF
+    vcf_frame_raw <- read.table(vcf_filepath, header = F, stringsAsFactors = F)
+    vcf_frame <- data.frame(vcf_frame_raw)
+    
+    ## Loop through every locus
+    
+    for(current_locus in haplo_locus_list){
+      if(current_locus == '2DL5A' | current_locus == '2DL5B'){
+        old_locus <- current_locus
+        current_locus <- '2DL5'
+      }
+      
+      if(iteration_dir == 'reference_1'){
+        all_allele_calling_frame_list[[current_locus]] <- list()
+      }
+      
+      ## Allele formatting
+      allele_name <- haplo_allele_list[grep(current_locus, haplo_allele_list)]
+      
+      ## Creating current_locus allele frame (dataframe with all alleles)
+      current_locus_allele_frame <- msf_to_allele_frame(msf_directory, current_locus)
+      
+      ## Create an allele specific bed conversion list to be used for VCF and allele frame naming
+      list_allele_pos_conv <- alternate_make_bed_to_pos_conv(bed_filepath, current_locus_allele_frame, allele_name)
+      
+      ## Create a relative allele frame that only contains nucleotide positions for the given reference allele (deletion positions are removed)
+      relative_allele_frame <- make_relative_allele_frame(current_locus_allele_frame, allele_name, list_allele_pos_conv)
+      
+      ## Create a unique position frame based on the relative allele frame
+      unique_pos_frame <- allele_frame_to_unique_pos_frame(relative_allele_frame, allele_name)
+      
+      ## Subset VCF frame to only include current locus
+      vcf_allele_frame <- vcf_frame[grep(allele_name, vcf_frame[,'V1'], fixed=T),]
+      
+      if(nrow(vcf_allele_frame) == 0){
+        cat('\n\nNo aligned reads for this iteration and locus.\n\n')
+        next
+      }
+      
+      ## Removing Indels
+      no_dels_vcf_allele_frame <- vcf_allele_frame[grep('INDEL', vcf_allele_frame[,'V8'], invert=T),]
+      row.names(no_dels_vcf_allele_frame) <- paste0('X',no_dels_vcf_allele_frame[,'V2'])
+      
+      ## Match up row names of the vcf_allele_frame with conversion list
+      row.names(no_dels_vcf_allele_frame) <- list_allele_pos_conv[row.names(no_dels_vcf_allele_frame)]
+      
+      ## Create a frame with only important positions
+      #allele_calling_frame <- na.omit(no_dels_vcf_allele_frame[colnames(unique_pos_frame),])
+      ## Instead we will return a frame with all positions
+      allele_calling_frame <- no_dels_vcf_allele_frame
+      
+      ## Adding the allele_frame to the return list
+      all_allele_calling_frame_list[[current_locus]][[iteration_dir]] <- allele_calling_frame
+    }
+  }
+  return(all_allele_calling_frame_list)
+}
+
 ## Speed-up stuff
 haplo_resources_directory <- 'Resources/haplo_resources'
-kir_gen_path <- file.path(haplo_resources_directory, 'KIR_gen.fasta')
-kir_nuc_path <- file.path(haplo_resources_directory, 'KIR_nuc.fasta')
+ipd_kir_resources_directory <- 'Resources/ipdkir_resources'
+caller_resources_directory <- 'Resources/caller_resources'
+msf_directory <- 'Resources/ipdkir_resources/IPD_KIR_MSF_Files/Formatted_MSF_Files'
+
+kir_gen_path <- file.path(ipd_kir_resources_directory, 'genomic_sequence', 'KIR_gen.fasta')
+kir_nuc_path <- file.path(ipd_kir_resources_directory, 'genomic_sequence', 'KIR_nuc.fasta')
 
 

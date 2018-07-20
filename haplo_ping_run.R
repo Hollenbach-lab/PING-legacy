@@ -1,10 +1,7 @@
 library(gtools)
 library(data.table)
 library(stringr)
-source('Resources/ping_functions.R')
 source('Resources/haplo_functions.R')
-
-
 
 ping_haplo <- function(
   sample.location = '',
@@ -18,8 +15,7 @@ ping_haplo <- function(
   
   results.directory = file.path(results.directory)
   combined.csv.file = normalizePath(combined.csv.file, mustWork=T)
-  
-  haplo_resources_directory <- 'Resources/haplo_resources/'
+
   master_haplo_path <- normalizePath(file.path(haplo_resources_directory, 'master_haplo_iteration_testing_v4.csv'), mustWork=T)
   
   ## Making sure we got the right output from ping_kff
@@ -36,13 +32,17 @@ ping_haplo <- function(
   ## Read in thegc_input.csv file
   master_gc_table <- read_master_gc(gc_input_path)
   
+  ##  ADD WAY TO INPUT MASTER GC TABLE FOR ALL SAMPLES ##
+  
+  
+  
   cat('\nReading in allele references\n')
   ## Reading in the reference allele name table
   master_haplo_table <- read_master_haplo(master_haplo_path)
   
   cat('\nReading in blacklisted alleles\n')
   ## Read in the blacklisted alleles (will not be called)
-  allele_blacklist_table <- read_blacklist(file.path(haplo_resources_directory, 'allele_blacklist.csv'))
+  allele_blacklist_table <- read_blacklist(file.path(caller_resources_directory, 'allele_blacklist.csv'))
   
   ## Normalizing loci names between the GC input and the reference table
   master_loci_intersection <- intersect(rownames(master_haplo_table), colnames(master_gc_table))
@@ -102,7 +102,7 @@ ping_haplo <- function(
       haplo <- master_haplo_table[sample_haplo_loci,i]
       ping_haplo_aligner(sample.location=sample.location,fastq.pattern.1=fastq.pattern.1,fastq.pattern.2=fastq.pattern.2,
                          results.directory=results.directory,sample.haplotype=haplo,sample.name=sample_id,
-                         ipdkir_allele_df = ipdkir_allele_df, ipdkir_nuc_df = ipdkir_nuc_df)
+                         ipdkir_allele_df = ipdkir_allele_df, ipdkir_nuc_df = ipdkir_nuc_df, haplo.iteration=i)
     }
       
     result_list <- ping_haplo_caller(sample.name=sample_id,results.directory=results.directory,
@@ -122,9 +122,13 @@ ping_haplo <- function(
         copy_number = 1
       }
         
-      allele_caller_input <- allele_caller_input_formatting(current_locus, result_list, haplo_resources_directory, allele_blacklist_table)
+      allele_caller_input <- allele_caller_input_formatting(current_locus, result_list, msf_directory, allele_blacklist_table)
       allele_type_list <- allele_caller(allele_caller_input$allele_calling_frame_list, allele_caller_input$possible_allele_frame, copy_number)
-        
+      
+      ### -------- NEW ALLELES CAN GO ANYWHERE BELOW HERE --------- ###
+      ### Variable position frame: allele_caller_input$possible_allele_frame
+      ### Vcf position frame: allele_caller_input$
+      
       if(all(allele_type_list == 'DID NOT PASS')){
         cat('\n\nThis sample did not have the correct GC input. Moving on.\n\n')
         skipped_samples <- c(skipped_samples, sample_id)
