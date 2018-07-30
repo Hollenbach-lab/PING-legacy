@@ -234,10 +234,14 @@ ping_gc_caller <- function(
     
     if(file.exists(file_name)){
       cat("Appending presence / absence information to kff_results.csv\n")
-      write.table(normalized_results, file = file_name, sep=',', append=TRUE, col.names = FALSE)
+      full_kff_table <- read.csv(file_name,row.names = 1)
+      merged_kff_table <- merge(full_kff_table, normalized_results, by = 0,all = T)
+      row.names(merged_kff_table) <- merged_kff_table[,1]
+      merged_kff_table[,1] <- NULL
+      write.csv(merged_kff_table, file = file_name)
     }else{
       cat("Writing presence / absence information to kff_results.csv\n")
-      write.table(normalized_results, file = file_name, sep=',')
+      write.csv(normalized_results, file = file_name)
     }
     cat("\n----------------------------------------------------------------\n")
   }
