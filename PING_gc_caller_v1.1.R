@@ -418,7 +418,7 @@ ping_gc_caller <- function(
           thresholds_legend[j] <- paste0("Copy number ", j - 1, " is < ", thresholds[j])
         }
         
-        legend("bottomright", as.character(thresholds_legend), title="Thresholds")
+        legend("topleft", as.character(thresholds_legend), title="Thresholds")
         
         cat("\n")
         flag <- readline("Would you like to keep these threshold values (y/n)? ")
@@ -717,7 +717,7 @@ ping_recalc <- function(
           thresholds_legend[j] <- paste0("Copy number ", j - 1, " is < ", thresholds[j])
         }
         
-        legend("bottomright", as.character(thresholds_legend), title="Thresholds")
+        legend("topleft", as.character(thresholds_legend), title="Thresholds")
           
         cat("\n")
         flag <- readline("Would you like to keep these threshold values (y/n)? ")

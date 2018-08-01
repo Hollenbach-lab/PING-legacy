@@ -505,8 +505,8 @@ filter_vcf_frame <- function(vcf_frame, vcf_threshold){
   
   if(nrow(vcf_frame) > 0){ ## Empty vcf_frames should pass right through
     dp_list <- as.integer(tstrsplit(tstrsplit(vcf_frame$V8, ';')[[1]], 'DP=')[[2]])
-    cut_off <- vcf_threshold*mean(dp_list)
-    vcf_frame <- vcf_frame[((dp_list >= cut_off) & (dp_list >= 20)),,drop=F]
+    #cut_off <- vcf_threshold*mean(dp_list)
+    vcf_frame <- vcf_frame[(dp_list >= vcf_threshold),,drop=F]
   }
   
   if(nrow(vcf_frame) > 0){
@@ -553,7 +553,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   variant_positions <- colnames(possible_allele_frame)
   
   ## Filtering any calls in the VCF files that do not pass the threshold
-  allele_calling_frame_list_filtered <- lapply(allele_calling_frame_list, filter_vcf_frame, 0.1)
+  allele_calling_frame_list_filtered <- lapply(allele_calling_frame_list, filter_vcf_frame, 6)
   
   ## Finding all positions that are in any VCF frame after filtration
   filtered_rownames <- lapply(allele_calling_frame_list_filtered, rownames)
@@ -614,7 +614,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     ## This could be a bad assumption, it will be something to look back on
     if(!(snp_pos %in% colnames(possible_allele_frame))){
       cat('\nContaminating bad call.\n')
-      next
+      return(list(distance='(0/1)',allele_names=c('nocall')))
     }
     
     
@@ -629,7 +629,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
       possible_allele_frame <- possible_allele_frame[good_alleles,,drop=F]
       
       if(nrow(possible_allele_frame) == 0){
-        return(list(distance='(0/0)',allele_names=c('newR')))
+        return(list(distance='(0/1)',allele_names=c('nocall')))
       }
     }
   }
@@ -639,10 +639,11 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   
   if(!all(het_positions %in% variant_positions)){
     ## This will probably be changed to catch new alleles
-    cat('\nNot all het calls are at variant positions. This likely indicates contaminating reads. Check out.\n')
-    cat('For now these het calls are being excluded.\n')
+    cat('\nNot all het calls are at variant positions. This likely indicates contaminating reads or new allele.\n')
+    cat('Returning a no call.\n')
     cat('POS: ', paste0(het_positions, collapse=', '))
-    het_positions <- intersect(het_positions, variant_positions)
+    #het_positions <- intersect(het_positions, variant_positions)
+    return(list(distance='(0/1)',allele_names=c('nocall')))
   }
   
   called_snp_frame <- called_snp_frame[colnames(original_possible_allele_frame),]
@@ -693,7 +694,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     n_alleles = 1
   }else{
     cat('\nNo rows in possible allele frame!!')
-    stop()
+    return(list(distance='(0/0)',allele_names=c('nocall')))
   }
   
   ## Single allele calling
@@ -747,6 +748,9 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
       for(snp_pos in colnames(allele_sequence)){
         allele_snps <- allele_sequence[,snp_pos]
         allele_snps <- unique(allele_snps)
+        
+        ## Excluding deletion reference symbols ('.') from allele calling
+        allele_snps <- allele_snps[unlist(lapply(allele_snps, is_nuc))]
         called_snp_vector <- unlist(called_snp_frame[snp_pos,])
         called_snp_vector <- called_snp_vector[!is.na(called_snp_vector)]
         
@@ -765,9 +769,15 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     cat(min_allele_names)
   }
   #min_allele_distance <- round((min_allele_distance / length(min_allele_names)), 4)
+  
   base_allele_mismatch_scale <- round((base_allele_mismatch_score / allele_mismatch_scale), 4)
-  min_allele_distance <- paste0('(', min_allele_distance, '/', base_allele_mismatch_scale, ')')
-  return(list(distance=min_allele_distance,allele_names=min_allele_names))
+  return_min_allele_distance <- paste0('(', min_allele_distance, '/', base_allele_mismatch_scale, ')')
+  
+  if(min_allele_distance > 0){
+    return(list(distance=return_min_allele_distance,allele_names=c('nocall')))
+  }
+  
+  return(list(distance=return_min_allele_distance,allele_names=min_allele_names))
 }
 
 ## Make possible_allele_frame and locus specific vcf result frames to use with the allele_caller function

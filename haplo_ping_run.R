@@ -118,6 +118,8 @@ ping_haplo <- function(
     for(current_locus in sample_haplo_loci){
       copy_number <- sample_haplo_raw[,current_locus]
       
+      ## Depending on experimental validation results, for certain loci we
+      ## may add conditions to keep the KFF result over the MIRA result or vice vera
       if(is.character(copy_number)){ ## Hack for conflicting gc
         copy_number = 1
       }
@@ -134,6 +136,7 @@ ping_haplo <- function(
         skipped_samples <- c(skipped_samples, sample_id)
         type_frame[sample_id,] <- NA
         distance_frame[sample_id,] <- NA
+        ## Add a 'nocall' flag into genotype output
         break
       }
       
