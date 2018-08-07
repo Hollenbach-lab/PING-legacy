@@ -610,6 +610,18 @@ ping_recalc <- function(
   check_kff_results <- function(){
     if(file.exists(paste0(old.results, "kff_results.csv"))){
       kff_results <- read.csv(paste0(old.results, "kff_results.csv"), check.names = F)
+      
+      # Apply same correction as 'check.names' and remove 'X' added to samples names that start with a number
+      sample_names <- names(kff_results)
+      for(i in 2:length(names(kff_results))){
+        sample_name <- sample_names[i]
+        if (substr(sample_name,1,1) == "X"){
+          sample_name <- substr(sample_name,2,nchar(sample_name))
+          sample_names[i] <- sample_name
+        }
+      }
+      names(kff_results) <- sample_names
+      
     }
     
     return(kff_results)
@@ -667,7 +679,7 @@ ping_recalc <- function(
           
           # Putting kff results in the same order
           kff_locus_results <- kff_results[grep(kff_locus, kff_results[,1]), kff_sample_order]
-          
+
           # Finding all KFF neg results
           kff_neg_samples <- colnames(kff_locus_results)[grepl(0, kff_locus_results)]
           
@@ -826,8 +838,7 @@ ping_recalc <- function(
     write.table(threshold_table, file = "New_thresholds.txt", quote = F, sep = "\t", na = "", row.names = F, col.names = thresh_columns)
     write.table(threshold_table, file = paste0(results, "New_thresholds.txt"), quote = F, sep = "\t", na = "", row.names = F, col.names = thresh_columns)
     
-    } else {
-    
+  } else {
     threshold_table <- data.frame(matrix(NA, nrow=15, ncol=11))
     default_table <- read.delim(threshold.file)
     threshold_table[,1:length(default_table)] <- default_table

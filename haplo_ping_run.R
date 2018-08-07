@@ -7,6 +7,7 @@ ping_haplo <- function(
   sample.location = '',
   fastq.pattern.1 = '_1.fastq.gz',
   fastq.pattern.2 = '_2.fastq.gz',
+  bowtie.threads  = 4,
   results.directory = '',
   combined.csv.file = ''
 ){
@@ -101,7 +102,7 @@ ping_haplo <- function(
     for(i in 1:5){
       haplo <- master_haplo_table[sample_haplo_loci,i]
       ping_haplo_aligner(sample.location=sample.location,fastq.pattern.1=fastq.pattern.1,fastq.pattern.2=fastq.pattern.2,
-                         results.directory=results.directory,sample.haplotype=haplo,sample.name=sample_id,
+                         results.directory=results.directory,bowtie.threads = bowtie.threads,sample.haplotype=haplo,sample.name=sample_id,
                          ipdkir_allele_df = ipdkir_allele_df, ipdkir_nuc_df = ipdkir_nuc_df, haplo.iteration=i)
     }
       
@@ -134,8 +135,8 @@ ping_haplo <- function(
       if(all(allele_type_list == 'DID NOT PASS')){
         cat('\n\nThis sample did not have the correct GC input. Moving on.\n\n')
         skipped_samples <- c(skipped_samples, sample_id)
-        type_frame[sample_id,] <- NA
-        distance_frame[sample_id,] <- NA
+        type_frame[sample_id,] <- "nocall"
+        distance_frame[sample_id,] <- "nocall"
         ## Add a 'nocall' flag into genotype output
         break
       }

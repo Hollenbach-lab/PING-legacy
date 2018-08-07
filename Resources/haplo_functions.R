@@ -14,7 +14,7 @@ exon_lengths <- list('2DL1'=c(34, 36, 300, 294, 51, 102, 53, 177),
                      '3DL1'=c(34, 36, 285, 300, 294, 51, 105, 53, 177),
                      '3DL2'=c(34, 36, 285, 300, 294, 51, 105, 53, 210),
                      '3DL3'=c(34, 36, 285, 300, 294, 105, 53, 126),
-                     '3DS1'=c(34, 36, 285, 300, 294, 51, 105, 52, 8),
+                     '3DS1'=c(34, 36, 285, 300, 294, 51, 106, 51, 8),
                      '2DP1'=c(34, 36, 299, 294, 51, 105, 53, 177))
 
 
@@ -154,7 +154,7 @@ make_bed <- function(haplo_directory, allele_list, bed_file_path, ipdkir_gen_df)
                        '3DL1'=c(34, 36, 285, 300, 294, 51, 105, 53, 177),
                        '3DL2'=c(34, 36, 285, 300, 294, 51, 105, 53, 210),
                        '3DL3'=c(34, 36, 285, 300, 294, 105, 53, 126),
-                       '3DS1'=c(34, 36, 285, 300, 294, 51, 105, 52, 8),
+                       '3DS1'=c(34, 36, 285, 300, 294, 51, 106, 51, 8),
                        '2DP1'=c(34, 36, 299, 294, 51, 105, 53, 177))
   first=T
   for(allele in allele_list){
@@ -186,7 +186,7 @@ make_bed <- function(haplo_directory, allele_list, bed_file_path, ipdkir_gen_df)
         if(allele %in% known_duplications & grepl(current_exon, gen_chr_string)){
           cat('\nThis is a known duplication')
         }else{
-          stop()
+          stop("\n>>> Stopped because of a duplication\n")
         }
       }
     }
@@ -561,7 +561,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   
   ## If there are no filtered rownames, then say this locus is negative for this sample
   if(length(unique_filtered_rownames) == 0){
-    return(list(distance='(0/1)',allele_names=c('neg'))) ## Changed from 'DID NOT PASS'
+    return(list(distance='(0/1)',allele_names=c('nocall_no_snps_left_after_filter'))) ## Changed from 'DID NOT PASS'
   }
   
   ## Ordering the rownames
@@ -614,7 +614,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     ## This could be a bad assumption, it will be something to look back on
     if(!(snp_pos %in% colnames(possible_allele_frame))){
       cat('\nContaminating bad call.\n')
-      return(list(distance='(0/1)',allele_names=c('nocall')))
+      return(list(distance='(0/1)',allele_names=c('nocall_notSNP_found_at_invariant_position')))
     }
     
     
@@ -629,7 +629,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
       possible_allele_frame <- possible_allele_frame[good_alleles,,drop=F]
       
       if(nrow(possible_allele_frame) == 0){
-        return(list(distance='(0/1)',allele_names=c('nocall')))
+        return(list(distance='(0/1)',allele_names=c('nocall_all_possible_alleles_dropped_due_to_notSNPS')))
       }
     }
   }
@@ -643,7 +643,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     cat('Returning a no call.\n')
     cat('POS: ', paste0(het_positions, collapse=', '))
     #het_positions <- intersect(het_positions, variant_positions)
-    return(list(distance='(0/1)',allele_names=c('nocall')))
+    return(list(distance='(0/1)',allele_names=c('nocall_het_call_at_invariant_pos')))
   }
   
   called_snp_frame <- called_snp_frame[colnames(original_possible_allele_frame),]
@@ -694,7 +694,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     n_alleles = 1
   }else{
     cat('\nNo rows in possible allele frame!!')
-    return(list(distance='(0/0)',allele_names=c('nocall')))
+    return(list(distance='(0/1)',allele_names=c('nocall_no_allele_differentiating_SNPS_left')))
   }
   
   ## Single allele calling
@@ -774,7 +774,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   return_min_allele_distance <- paste0('(', min_allele_distance, '/', base_allele_mismatch_scale, ')')
   
   if(min_allele_distance > 0){
-    return(list(distance=return_min_allele_distance,allele_names=c('nocall')))
+    return(list(distance=return_min_allele_distance,allele_names=c('new_does_not_perfectly_match_known_alleles')))
   }
   
   return(list(distance=return_min_allele_distance,allele_names=min_allele_names))
