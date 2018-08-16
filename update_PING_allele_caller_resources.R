@@ -92,6 +92,17 @@ update_caller_resources <- function(
     return(allele_formatted)
   }
   
+  # Format 2DL2 allele sequences to fill in 3bp gap found in a multiple alignment of 2DL2 and 2DL3 alleles (August 2018)
+  # - As of August 2018, a 'TCC' must be inserted at position 773 to line up 2DL2 and 2DL3 alleles
+  format_2DL2_allele_seq <- function(fasta_seq){
+    seq_length <- nchar(fasta_seq)
+    seq_part1 <- substr(fasta_seq,1,772)
+    insert_seq <- 'TCC'
+    seq_part2 <- substr(fasta_seq,773,seq_length)
+    fasta_seq_corrected <- paste(c(seq_part1,insert_seq,seq_part2),collapse = "")
+    
+    return(fasta_seq_corrected)
+  }
   
   ###################
   # MAIN CODE: -------------------------------------------------------
@@ -122,7 +133,8 @@ update_caller_resources <- function(
   msf.files <- dir(resource_location, pattern = ".msf")
   
   cat(paste0("\n>> CREATING FORMATTED ALLELE RESOURCES:\n"))
-  for(file in msf.files){
+  end_seg_2DL2 <- ""
+  for(file in sort(msf.files)){
     current_locus <- tstrsplit(file,"_", fixed=T)[[1]]
     current_locus <- tstrsplit(current_locus,"KIR",fixed=T)[[2]]
     output_fasta_fh <- paste0(results.directory, "/All_", current_locus, "_preKFF.fas")
@@ -159,6 +171,17 @@ update_caller_resources <- function(
       }
       
       fasta_seq    <- paste(allele_frame.processed[allele,],collapse = '')
+      # Make custom changes for 2DL2 alleles
+      if (current_locus == "2DL2"){
+        fasta_seq <- format_2DL2_allele_seq(fasta_seq)
+        # segment extending from position 1027 - 1050 needs to be stored so it can be added to the end of 2DL3 alleles
+        end_seg_2DL2 <- substr(fasta_seq,1027,nchar(fasta_seq))
+      }
+      # Make custom change to 2DL3 alleles to ensure their lengths are equal to 2DL2 alleles
+      if (current_locus == "2DL3" && nchar(end_seg_2DL2) != 0){
+        fasta_seq <- paste(c(fasta_seq,end_seg_2DL2),collapse = "")
+      }
+      
       entry        <- paste0(fasta_allele,"\t",fasta_seq)
       fasta_entries[i] <- entry
       
