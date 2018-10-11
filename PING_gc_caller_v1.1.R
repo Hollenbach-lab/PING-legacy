@@ -14,15 +14,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
-
+setwd('/home/common_arse/ping_development_projects/PING')
 ping_gc_caller <- function(
-  run.MIRA = TRUE,
-  make.graphs = TRUE,
-  sample.location = "PING_sequences/",
+  run.MIRA = FALSE,
+  make.graphs = FALSE,
+  sample.location = "/home/common_arse/temp_indigo_discrepant_2DL23_samples/",
   threshold.file = "Resources/gc_resources/defaultThresholds.txt",
   threshold.KFF = 0.2,
   read.cap = 120000,
-  results.directory = "",
+  results.directory = "/home/common_arse/INDIGO/3_PING_output/ping_indigo_2DL23_discrepant_gc_rerun",
   probelist.file = 'Resources/gc_resources/probelist_2017_09_19.csv',
   fastq.pattern.1 = "_1.fastq.gz",
   fastq.pattern.2 = "_2.fastq.gz"
@@ -855,3 +855,5 @@ ping_recalc <- function(
   # End of MIRA
 
 }
+
+ping_gc_caller()

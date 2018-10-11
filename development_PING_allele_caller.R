@@ -97,7 +97,8 @@ ping_allele_caller_dev <- function(
   
   # Pull in the GC results (original PING function)
   #gc_results <- gc.results()
-  # Read in Custom GC table for all samples
+  
+  ## Read in Custom GC table for all samples
   gc_results <- read.csv(ping.gc.output,header = TRUE, row.names = 1, check.names = F)
   gc_results <- as.data.frame(t(gc_results))
   
@@ -161,7 +162,15 @@ ping_allele_caller_dev <- function(
       }
       
       # Generating known alleles for the current locus
-      alleles_gen.vcf(current.locus, resource.location = allele_resources)  # Re-formatted Resource files
+      if (current.locus == "2DL23"){
+        for (locus in c("2DL2","2DL3","2DL23")){
+          alleles_gen.vcf(locus, resource.location = allele_resources)  # Re-formatted Resource files
+          snps_gen.vcf(locus)  # Generate necessary files to create a lookup table for 2DL23,2DL3 or 2DL2
+        }
+      }else{
+        alleles_gen.vcf(current.locus, resource.location = allele_resources)  # Re-formatted Resource files
+      }
+      
       
       # Generating position information for the current locus
       SOS_locus_lookup <- snps_gen.vcf(current.locus)
@@ -183,7 +192,7 @@ ping_allele_caller_dev <- function(
         
         if(length(vcf_table[,1]) == 383) {
           pos2DL2 <- TRUE
-          alleles_gen.vcf("2DL2")
+          alleles_gen.vcf("2DL2", resource.location = allele_resources)
         }
         
         # 2DL3+ test

@@ -1,15 +1,19 @@
+library(ape) ## Used for read.dna an seg.sites
+library(digest) ## use for md5 hash algorithm
 library(gtools)
 library(data.table)
 library(stringr)
+source("Resources/caller_functions.R",local = TRUE)
 source('Resources/haplo_functions.R')
 
 ping_haplo <- function(
-  sample.location = '',
+  sample.location = '/home/common_arse/temp_indigo_all_missing_leftovers/',
   fastq.pattern.1 = '_1.fastq.gz',
   fastq.pattern.2 = '_2.fastq.gz',
-  bowtie.threads  = 4,
-  results.directory = '',
-  combined.csv.file = ''
+  bowtie.threads  = 36,
+  results.directory = '/home/common_arse/INDIGO/3_PING_output/ping_haplo_3DL1S1_new_alleles_rerun_leftovers',
+  combined.csv.file = '/home/common_arse/ping_development_projects/GC_table_all_batches.csv',
+  DPthresh = 6
 ){
   ipdkir_allele_df <- get_ipdkir_allele_df(kir_gen_path)
   ipdkir_nuc_df <- get_ipdkir_allele_df(kir_nuc_path)
@@ -80,12 +84,12 @@ ping_haplo <- function(
   
   ## Initialize list for storing what samples are skipped
   skipped_samples <- c()
-  for(sample_id in sample_list){
+  for(sample_id in sample_list[13:length(sample_list)]){
     cat('\n\n')
     cat(sample_id, '\n')
     
-    #distance_frame <- read.table(file.path(results.directory, 'distance_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
-    #type_frame <- read.table(file.path(results.directory, 'type_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
+    distance_frame <- read.table(file.path(results.directory, 'distance_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
+    type_frame <- read.table(file.path(results.directory, 'type_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
     #gc_frame <- read.table(file.path(results.directory, 'gc_frame.csv'),stringsAsFactors = F,sep=',',check.names=F)
     
     ## These two lines are unnecessary unless reading in the tables from file (previous three commented lines)
@@ -124,13 +128,34 @@ ping_haplo <- function(
       if(is.character(copy_number)){ ## Hack for conflicting gc
         copy_number = 1
       }
-        
+
       allele_caller_input <- allele_caller_input_formatting(current_locus, result_list, msf_directory, allele_blacklist_table)
-      allele_type_list <- allele_caller(allele_caller_input$allele_calling_frame_list, allele_caller_input$possible_allele_frame, copy_number)
+      allele_type_list <- allele_caller(allele_caller_input$allele_calling_frame_list, allele_caller_input$possible_allele_frame, copy_number, DPthresh = DPthresh)
+      
+      genos_out <- paste0(allele_type_list$allele_names, collapse=' ')
       
       ### -------- NEW ALLELES CAN GO ANYWHERE BELOW HERE --------- ###
       ### Variable position frame: allele_caller_input$possible_allele_frame
       ### Vcf position frame: allele_caller_input$
+      #if(!is.null(allele_type_list$called_snp_frame)){
+      #  SOS_locus_lookup <- allele_caller_input$possible_allele_frame
+      #  SOS_locus_lookup$allele <- row.names(SOS_locus_lookup)
+      #  called_snp_frame <- allele_type_list$called_snp_frame
+        
+        # Create Data Frame of new alleles output
+      #  if (length(called_snp_frame[!is.na(called_snp_frame$X3)]) != 0){
+          # return with an error, enumeration function does not support more than positions with 2 or more alt. calls
+      #    genos_out <- paste0(genos_out,"__excess_alt_calls")
+      #  }
+        ### TEMP Silence new alleles function
+        #else{
+        #  # Generate New alleles Output
+        #  new_alleles_df <- new_allele_caller(SOS_locus_lookup,called_snp_frame,current_locus,DPthresh = DPthresh,mismatchThresh = 1)
+        #}
+        
+        
+      #}
+      
       
       if(all(allele_type_list == 'DID NOT PASS')){
         cat('\n\nThis sample did not have the correct GC input. Moving on.\n\n')
@@ -141,7 +166,7 @@ ping_haplo <- function(
         break
       }
       
-      type_frame[sample_id,current_locus] <- paste0(allele_type_list$allele_names, collapse=' ')
+      type_frame[sample_id,current_locus] <- genos_out
       write.table(type_frame,file=file.path(results.directory,'type_frame.csv'),quote=F,sep=',')
       
       distance_frame[sample_id,current_locus] <- paste0(allele_type_list$distance, collapse=' ')

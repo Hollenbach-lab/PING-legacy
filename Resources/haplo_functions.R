@@ -545,15 +545,355 @@ mean_dp_vcf_frame <- function(vcf_frame){
   return(mean(dp_list))
 }
 
+## Call new alleles from integrated VCF output from all rounds of haplotye alignment
+new_allele_caller <- function(SOS_locus_lookup,called_snp_frame,current_locus,DPthresh=6, mismatchThresh = 1){
+  # Initialize Vector of reference KIR alleles for formatting new allele names
+  #  - Alleles used as reference for IPD-KIR multiple alignments for each KIR locus as of June 2018
+  ref_allele_names <- c(
+    "KIR2DL1*001",
+    "KIR2DL2*0010101",
+    "KIR2DL3*0010101",
+    "KIR2DL4*00101",
+    "KIR2DL5A*0010101",
+    "KIR2DP1*0010201",
+    "KIR2DS1*001",
+    "KIR2DS2*0010101",
+    "KIR2DS3*00101",
+    "KIR2DS4*0010101",
+    "KIR2DS5*001",
+    "KIR3DL1*0010101",
+    "KIR3DL2*0010101",
+    "KIR3DL3*00101",
+    "KIR3DP1*001",
+    "KIR3DS1*010"
+  )
+  
+  # Store read position info
+  all_reads_pos <- row.names(called_snp_frame)
+  reads_pos <- row.names(called_snp_frame)
+  reads_pos <- reads_pos[reads_pos %in% names(SOS_locus_lookup)]
+  
+  
+  ##enumerate all possible genotypes
+  hmat <- as.matrix(rbind(called_snp_frame$X1, called_snp_frame$X2))
+  # Fill out second row beased on the current combined VCF organization, 
+  # any position that is NA is the same as the the ref call in row 1
+  for (i in 1:length(hmat[1,])){
+    ref1 <- hmat[1,i]
+    ref2 <- hmat[2,i]
+    if(is.na(ref2)){
+      hmat[2,i] <- ref1
+    }
+  }
+  
+  poss_haps <- haplo.enum(hmat, F, reads_pos)
+  poss_genos <- data.frame(cbind(apply(poss_haps$h1, MARGIN=1, paste, collapse=""), apply(poss_haps$h2, MARGIN=1, paste, collapse="")))
+  poss_genos$X1 <- as.character(poss_genos$X1)
+  poss_genos$X2 <- as.character(poss_genos$X2)
+  
+  ##get right loookup table based on which snps we have calls for in VCF file
+  SOS_locus_lookup_reads <- SOS_locus_lookup[,c("allele", reads_pos)]
+  lookitup <- data.frame(cbind(apply(SOS_locus_lookup_reads[,-1], MARGIN=1, paste, collapse=""), as.character(SOS_locus_lookup$allele)))
+  names(lookitup) <- c("string","allele")
+  lookitup$allele <- as.character(lookitup$allele)
+  lookitup$string <- as.character(lookitup$string)
+  lookitup$string <- gsub('\\*','-',lookitup$string)   # Substitute '*' for '-'
+  ##find allelic ambiguities in current lookup table
+  
+  all_amb<-c(1:length(lookitup))
+  for(i in seq_along(lookitup$string)) {
+    query_string <- gsub('\\*','-',lookitup$string[i]) # Substitute '*' for '-'
+    l <- str_detect(lookitup$string,query_string)
+    ll <- lookitup$allele[l]
+    
+    all_amb[i] <- paste(ll, collapse="/")
+  }
+  
+  lookitup <- cbind(lookitup,as.character(all_amb), stringsAsFactors=FALSE)
+  names(lookitup) <- c("string", "allele", "amb")
+  
+  ###allle calling
+  allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
+  allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")
+  
+  genos <- data.frame(cbind(as.character(allele1), as.character(allele2)),stringsAsFactors = F)
+  genos$string1 <- poss_genos$X1
+  genos$string2 <- poss_genos$X2
+  
+  #### CREATE NEW ALLELE DATA FRAME HERE!!!  ################################################
+  pos_vec <- reads_pos  # potentially remove 'X's from position names
+  # Conversion from Genomic to CDS positions
+  #pos_vec_conv        <- reads_pos_cds
+  #names(pos_vec_conv) <- reads_pos_genomic
+  
+  new_alleles_vec      <- c()
+  new_alleles_seq_vec  <- c()
+  new_alleles_geno_vec <- c()
+  new_alleles_categ    <- c() # possible genotypes will always be either new+known(allele) or new+new
+  # Create Data Frame of all variable positions for new allele variants
+  new_alleles_pos_var_df <- data.frame(matrix(nrow=0, ncol=length(pos_vec)))
+  names(new_alleles_pos_var_df) <- pos_vec
+  
+  for(i in 1:length(row.names(genos))){
+    A1                <- genos[i,1]
+    A2                <- genos[i,2]
+    A1_seq            <- genos[i,3]
+    A2_seq            <- genos[i,4]
+    A1_seq_vec        <- unlist(strsplit(A1_seq,""))
+    A2_seq_vec        <- unlist(strsplit(A2_seq,""))
+    names(A1_seq_vec) <- all_reads_pos
+    names(A2_seq_vec) <- all_reads_pos
+    
+    Aref <- ref_allele_names[grep(current_locus,ref_allele_names)]
+    Aref_seq_vec <- SOS_locus_lookup_reads[SOS_locus_lookup_reads$allele == Aref,]
+    Aref_seq_vec$allele <- NULL
+    
+    # Category of possible genotype
+    categ_geno <- "new+known"
+    if (A1 =="new" && A2 == "new"){categ_geno <- "new+new"}
+    
+    if (categ_geno == "new+known"){
+      # Only one new allele detected in this possible genotype
+      if (A1 == "new"){
+        comp_Aref_new_df <- rbind(Aref_seq_vec,A1_seq_vec)
+        unique_nuc_vec   <- apply(comp_Aref_new_df,2, num_unique_nuc)
+        unique_nuc_vec   <- unique_nuc_vec[unique_nuc_vec > 1]
+        
+        # Add reformatted name back into the genos data frame to replace the 'new' flags
+        defining_new_allele_pos            <- as.data.frame(comp_Aref_new_df[2,names(unique_nuc_vec)])
+        names(defining_new_allele_pos)     <- names(unique_nuc_vec)
+        row.names(defining_new_allele_pos) <- "2"
+        
+        # Generate new allele name and substitute it to replace 'new' flags
+        new_allele_name                <- format_new_allele_name(defining_new_allele_pos,Aref)
+        genos[i,1]                     <- new_allele_name
+        poss_genotype                  <- c(genos[i,1],genos[i,2])
+        poss_genotype                  <- paste(poss_genotype,collapse = "+")
+        
+        # Store new allele variant in a vector
+        new_alleles_vec      <- c(new_alleles_vec,new_allele_name)
+        new_alleles_geno_vec <- c(new_alleles_geno_vec,poss_genotype)
+        new_alleles_seq_vec  <- c(new_alleles_seq_vec, A1_seq)
+        new_alleles_categ    <- c(new_alleles_categ,categ_geno)
+        
+        # Format Data Frame entry
+        #   - If there are missing variable positions that have been filtered due to low depth, subsitute in an N
+        new_allele_entry                     <- data.frame(matrix(nrow=1, ncol=length(pos_vec)))
+        names(new_allele_entry)              <- pos_vec
+        new_allele_entry[1,]                 <- "N"
+        new_allele_entry[,names(A1_seq_vec)] <- A1_seq_vec
+        row.names(new_allele_entry)          <- new_allele_name
+        names(new_allele_entry)              <- as.character(pos_vec)
+        new_alleles_pos_var_df               <- rbind(new_alleles_pos_var_df, new_allele_entry)
+        
+      }
+      
+      if (A2 == "new"){
+        comp_Aref_new_df <- rbind(Aref_seq_vec,A2_seq_vec)
+        unique_nuc_vec   <- apply(comp_Aref_new_df,2, num_unique_nuc)
+        unique_nuc_vec   <- unique_nuc_vec[unique_nuc_vec > 1]
+        
+        # Add reformatted name back into the genos data frame to replace the 'new' flags
+        defining_new_allele_pos            <- as.data.frame(comp_Aref_new_df[2,names(unique_nuc_vec)])
+        names(defining_new_allele_pos)     <- names(unique_nuc_vec)
+        row.names(defining_new_allele_pos) <- "2"
+        # Convert Genomic positions to CDS positions
+        names(defining_new_allele_pos) <- pos_vec_conv[names(defining_new_allele_pos)]
+        # Generate new allele name and substitute it to replace 'new' flags
+        new_allele_name                <- format_new_allele_name(defining_new_allele_pos,Aref)
+        genos[i,2]                     <- new_allele_name
+        poss_genotype                  <- c(genos[i,2],genos[i,1])
+        poss_genotype                  <- paste(poss_genotype,collapse = "+")
+        
+        # Store new allele variant in a vector
+        new_alleles_vec      <- c(new_alleles_vec,new_allele_name)
+        new_alleles_geno_vec <- c(new_alleles_geno_vec,poss_genotype)
+        new_alleles_seq_vec  <- c(new_alleles_seq_vec, A2_seq)
+        new_alleles_categ    <- c(new_alleles_categ,categ_geno)
+        
+        # Format Data Frame entry
+        #   - If there are missing variable positions that have been filtered due to low depth, subsitute in an N
+        new_allele_entry                     <- data.frame(matrix(nrow=1, ncol=length(pos_vec_conv)))
+        names(new_allele_entry)              <- reads_pos_genomic
+        new_allele_entry[1,]                 <- "N"
+        new_allele_entry[,names(A2_seq_vec)] <- A2_seq_vec
+        row.names(new_allele_entry)          <- new_allele_name
+        names(new_allele_entry)              <- as.character(pos_vec_conv)
+        new_alleles_pos_var_df               <- rbind(new_alleles_pos_var_df, new_allele_entry)
+      }
+    } else{
+      # No known allele detected in this possible genotype
+      a1_comp_Aref_new_df <- rbind(Aref_seq_vec,A1_seq_vec)
+      a1_unique_nuc_vec   <- apply(a1_comp_Aref_new_df,2, num_unique_nuc)
+      a1_unique_nuc_vec   <- a1_unique_nuc_vec[a1_unique_nuc_vec > 1]
+      
+      a2_comp_Aref_new_df <- rbind(Aref_seq_vec,A2_seq_vec)
+      a2_unique_nuc_vec   <- apply(a2_comp_Aref_new_df,2, num_unique_nuc)
+      a2_unique_nuc_vec   <- a2_unique_nuc_vec[a2_unique_nuc_vec > 1]
+      
+      
+      # Add reformatted name back into the genos data frame to replace the 'new' flags
+      a1_defining_new_allele_pos            <- as.data.frame(a1_comp_Aref_new_df[2,names(a1_unique_nuc_vec)])
+      names(a1_defining_new_allele_pos)     <- names(a1_unique_nuc_vec)
+      row.names(a1_defining_new_allele_pos) <- "2"
+      a2_defining_new_allele_pos            <- as.data.frame(a2_comp_Aref_new_df[2,names(a2_unique_nuc_vec)])
+      names(a2_defining_new_allele_pos)     <- names(a2_unique_nuc_vec)
+      row.names(a2_defining_new_allele_pos) <- "2"
+      
+      # Generate new allele name and substitute it to replace 'new' flags
+      a1_new_allele_name                <- format_new_allele_name(a1_defining_new_allele_pos,Aref)
+      a2_new_allele_name                <- format_new_allele_name(a2_defining_new_allele_pos,Aref)
+      genos[i,1]                        <- a1_new_allele_name
+      genos[i,2]                        <- a2_new_allele_name
+      
+      # CHANGE this part: add conditions to how possible genotypes are formed for new+new
+      # new allele variants are the same
+      if (a1_new_allele_name == a2_new_allele_name && A1_seq == A2_seq){
+        poss_genotype                  <- c(genos[i,1],genos[i,2])
+        poss_genotype                  <- paste(poss_genotype,collapse = "+")
+        
+        # Store new allele variant in a vector
+        new_alleles_vec      <- c(new_alleles_vec,a1_new_allele_name)
+        new_alleles_geno_vec <- c(new_alleles_geno_vec,poss_genotype)
+        new_alleles_seq_vec  <- c(new_alleles_seq_vec, A1_seq)
+        new_alleles_categ    <- c(new_alleles_categ,categ_geno)
+        
+        # Format Data Frame entry
+        #   - If there are missing variable positions that have been filtered due to low depth, subsitute in an N
+        new_allele_entry                     <- data.frame(matrix(nrow=1, ncol=length(pos_vec)))
+        names(new_allele_entry)              <- pos_vec
+        new_allele_entry[1,]                 <- "N"
+        new_allele_entry[,names(A1_seq_vec)] <- A1_seq_vec
+        row.names(new_allele_entry)          <- a1_new_allele_name
+        names(new_allele_entry)              <- as.character(pos_vec)
+        new_alleles_pos_var_df               <- rbind(new_alleles_pos_var_df, new_allele_entry)
+        
+      } else{
+        # Create new alleles entry for each distinct variant
+        a1_poss_genotype                  <- c(genos[i,1],genos[i,2])
+        a1_poss_genotype                  <- paste(a1_poss_genotype,collapse = "+")
+        
+        a2_poss_genotype                  <- c(genos[i,2],genos[i,1])
+        a2_poss_genotype                  <- paste(a2_poss_genotype,collapse = "+")
+        
+        # Store new allele variant in a vector
+        new_alleles_vec      <- c(new_alleles_vec,a1_new_allele_name)
+        new_alleles_geno_vec <- c(new_alleles_geno_vec,a1_poss_genotype)
+        new_alleles_seq_vec  <- c(new_alleles_seq_vec, A1_seq)
+        new_alleles_categ    <- c(new_alleles_categ,categ_geno)
+        
+        new_alleles_vec      <- c(new_alleles_vec,a2_new_allele_name)
+        new_alleles_geno_vec <- c(new_alleles_geno_vec,a2_poss_genotype)
+        new_alleles_seq_vec  <- c(new_alleles_seq_vec, A2_seq)
+        new_alleles_categ    <- c(new_alleles_categ,categ_geno)
+        
+        
+        # Format Data Frame entry
+        a1_new_allele_entry                     <- data.frame(matrix(nrow=1, ncol=length(pos_vec)))
+        names(a1_new_allele_entry)              <- pos_vec
+        a1_new_allele_entry[1,]                 <- "N"
+        a1_new_allele_entry[,names(A1_seq_vec)] <- A1_seq_vec
+        row.names(a1_new_allele_entry)          <- a1_new_allele_name
+        names(a1_new_allele_entry)              <- as.character(pos_vec)
+        new_alleles_pos_var_df                  <- rbind(new_alleles_pos_var_df, a1_new_allele_entry)
+        
+        a2_new_allele_entry                     <- data.frame(matrix(nrow=1, ncol=length(pos_vec)))
+        names(a2_new_allele_entry)              <- pos_vec
+        a2_new_allele_entry[1,]                 <- "N"
+        a2_new_allele_entry[,names(A2_seq_vec)] <- A2_seq_vec
+        row.names(a2_new_allele_entry)          <- a2_new_allele_name
+        names(a2_new_allele_entry)              <- as.character(pos_vec)
+        new_alleles_pos_var_df               <- rbind(new_alleles_pos_var_df, a2_new_allele_entry)
+      }
+    }
+    
+  }
+  ####
+  
+  names(new_alleles_seq_vec)  <- new_alleles_vec
+  names(new_alleles_geno_vec) <- new_alleles_vec
+  names(new_alleles_categ)    <- new_alleles_vec
+  
+  # Compute difference (mismatches) of new allele compared to known alleles for the KIR locus specified  
+  res.df <- data.frame(adist(new_alleles_seq_vec,lookitup$string))
+  names(res.df) <- lookitup$allele
+  
+  # Start formatting Data frame of new variants
+  new_alleles_df      <- as.data.frame(new_alleles_seq_vec)
+  new_alleles_df$geno <- new_alleles_geno_vec
+  
+  # NO filter: Create genotype string from genos data frame  --> not being used
+  #new_alleles.geno <- create_new_alleles_genos(genos)
+  
+  # FILTER: only keep new alleles combos that are only one mismatch away from a known allele 
+  oneoff.alleles.df            <- data.frame(matrix(nrow = length(row.names(res.df)),ncol = 1))
+  row.names(oneoff.alleles.df) <- row.names(res.df)
+  names(oneoff.alleles.df)     <- "new.allele.near"
+  
+  oneoff.coords  <- data.frame(which(res.df==mismatchThresh,arr.ind=TRUE))
+  oneoff.rows    <- unique(oneoff.coords$row)
+  oneoff.df      <- res.df[oneoff.rows,]
+  
+  known_alleles.vec <- names(res.df)
+  variants.vec      <- row.names(res.df)
+  for (r in oneoff.rows){
+    coord_subset    <- subset(oneoff.coords,oneoff.coords$row == r)
+    col_of_interest <- coord_subset$col
+    variant_name    <- variants.vec[r]
+    oneoff_alleles  <- known_alleles.vec[col_of_interest] 
+    
+    all_nearest_alleles <- ""
+    if (length(oneoff_alleles) == 1){
+      all_nearest_alleles <- oneoff_alleles
+    } else{
+      all_nearest_alleles <- paste(oneoff_alleles,collapse = "/")
+    }
+    oneoff.alleles.df[variant_name,] <- all_nearest_alleles
+  }
+  
+  # Remove NAs for One off alleles data frame
+  oneoff.alleles.df <- subset(oneoff.alleles.df, !is.na(oneoff.alleles.df$new.allele.near))
+  
+  # If any new allele is near a known allele, include that info
+  new_alleles_df$new.allele.near <- NA
+  if (length(row.names(oneoff.alleles.df)) != 0){
+    for (target_allele in row.names(oneoff.alleles.df)){
+      curr_geno           <- unlist(strsplit(as.character(new_alleles_df[target_allele,2]),"+",fixed = T))
+      nearest_allele      <- oneoff.alleles.df[target_allele,]
+      curr_geno[1]        <- nearest_allele
+      curr_geno           <- paste(curr_geno,collapse = "+")
+      new_alleles_df[target_allele,2] <- curr_geno
+      new_alleles_df[target_allele,3] <- nearest_allele 
+    }
+  }
+  names(new_alleles_df) <- c("variable.pos.bases","geno","new.allele.near")
+  new_alleles_df$categ  <- new_alleles_categ
+  new_alleles_df$sample <- sample_id
+  new_alleles_df$new.allele.name <- row.names(new_alleles_df)
+  
+  # Re-arrange into proper output form 
+  #new_alleles_df$new.allele.near <- as.character(new_alleles_df$new.allele.near)
+  #new_alleles_df$new.allele.near <- ifelse(is.na(new_alleles_df$new.allele.near),'NA',new_alleles_df$new.allele.near)
+  new_alleles_df <- as.data.frame(new_alleles_df[,c("sample","new.allele.name","new.allele.near","geno","categ","variable.pos.bases")])
+  
+  # Merge new allele genotype info with SNP position info
+  new_alleles_df.merged <- merge(new_alleles_df,new_alleles_pos_var_df, by=0,all = T)
+  new_alleles_df.merged$variable.pos.bases <- NULL
+  new_alleles_df.merged$Row.names          <- NULL
+  
+  new_alleles_df.merged
+  
+}
+
 ## Call alleles from locus specific vcf result frames
-allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_alleles){
+allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_alleles, DPthresh = 6){
   
   ## Saving a copy of the possible allele frame, since it will be cut down during this function
   original_possible_allele_frame <- possible_allele_frame
   variant_positions <- colnames(possible_allele_frame)
   
   ## Filtering any calls in the VCF files that do not pass the threshold
-  allele_calling_frame_list_filtered <- lapply(allele_calling_frame_list, filter_vcf_frame, 6)
+  allele_calling_frame_list_filtered <- lapply(allele_calling_frame_list, filter_vcf_frame, DPthresh)
   
   ## Finding all positions that are in any VCF frame after filtration
   filtered_rownames <- lapply(allele_calling_frame_list_filtered, rownames)
@@ -561,7 +901,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   
   ## If there are no filtered rownames, then say this locus is negative for this sample
   if(length(unique_filtered_rownames) == 0){
-    return(list(distance='(0/1)',allele_names=c('nocall_no_snps_left_after_filter'))) ## Changed from 'DID NOT PASS'
+    return(list(distance='(0/1)',allele_names=c('nocall_no_snps_left_after_filter'), called_snp_frame=NULL)) ## Changed from 'DID NOT PASS'
   }
   
   ## Ordering the rownames
@@ -572,11 +912,24 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   called_snp_frame <- data.frame(matrix(nrow=length(unique_filtered_rownames),ncol=5), row.names = unique_filtered_rownames)
   not_calls <- list()
   
+  ## Initialize a list for counting how many rounds a snp shows up for each position
+  snp_pos_count <- list()
+
   ## Filling out called_snp_frame, as well as recording any bad calls
   for(snp_pos in unique_filtered_rownames){
+    
+    ## initalize a vector of bad calls for this position
     not_calls[[snp_pos]] <- c()
+    
+    ## initialize the count for this snp position
+    snp_pos_count[[snp_pos]] <- 0
+
     for(calling_frame in allele_calling_frame_list_filtered){
       if(snp_pos %in% rownames(calling_frame)){
+        
+        ## Iterate the count for this position
+        snp_pos_count[[snp_pos]] <- as.integer(snp_pos_count[[snp_pos]]) + 1
+        
         geno_call <- calling_frame[snp_pos,10]
         geno_call <- tstrsplit(geno_call, ':')[[1]]
         snp_calls <- calling_frame[snp_pos,4:5]
@@ -596,15 +949,43 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
         
         for(snp_call in snp_geno_calls){
           if(snp_call %in% unlist(called_snp_frame[snp_pos,])){
+            col_pos_in_frame <- which(snp_call == unlist(called_snp_frame[snp_pos,]))[[1]]
+            #called_snp_frame[snp_pos,col_pos_in_frame+1] <- called_snp_frame[snp_pos,col_pos_in_frame+1]+1
             next
           }else{
             col_pos_in_frame <- sum(!is.na(called_snp_frame[snp_pos,]))+1
             called_snp_frame[snp_pos,col_pos_in_frame] <- snp_call
+            #called_snp_frame[snp_pos,col_pos_in_frame+1] <- 1
           }
         }
       }
     }
   }
+  
+  ## This section removes SNPs that are not found across a minimum of min_rounds or snp_round_count, whichever is lowest
+  #snp_round_count_cols <- c('X2','X4','X6','X8','X10')
+  #for(snp_pos in names(snp_pos_count)){
+  #  current_pos_count <-snp_pos_count[[snp_pos]]
+  #  current_cols <- snp_round_count_cols[!is.na(called_snp_frame[snp_pos,snp_round_count_cols])]
+  #  
+  #  current_cols <- current_cols[!(called_snp_frame[snp_pos,current_cols] >= min_rounds)]
+  #  
+  #  if(length(current_cols) == 0){
+  #    next
+  #  }else{
+  #    bad_cols <- current_cols[called_snp_frame[snp_pos,current_cols] != current_pos_count]
+  #    
+  #    for(bad_col in bad_cols){
+  #      bad_col_index <- which(bad_col == colnames(called_snp_frame))
+  #      called_snp_frame[snp_pos,bad_col_index] <- NA
+  #      called_snp_frame[snp_pos,bad_col_index-1] <- NA
+  #    }
+  #  }
+  #}
+  
+  #called_snp_frame <- called_snp_frame[,c('X1','X3','X5','X7','X9')]
+  #colnames(called_snp_frame) <- c('X1','X2','X3','X4','X5')
+  
   
   ## Iterating through the bad calls to cut down the possible allele frame
   for(snp_pos in names(not_calls)){
@@ -614,7 +995,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     ## This could be a bad assumption, it will be something to look back on
     if(!(snp_pos %in% colnames(possible_allele_frame))){
       cat('\nContaminating bad call.\n')
-      return(list(distance='(0/1)',allele_names=c('nocall_notSNP_found_at_invariant_position')))
+      return(list(distance='(0/1)',allele_names=c('nocall_notSNP_found_at_invariant_position'),called_snp_frame=called_snp_frame))
     }
     
     
@@ -629,7 +1010,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
       possible_allele_frame <- possible_allele_frame[good_alleles,,drop=F]
       
       if(nrow(possible_allele_frame) == 0){
-        return(list(distance='(0/1)',allele_names=c('nocall_all_possible_alleles_dropped_due_to_notSNPS')))
+        return(list(distance='(0/1)',allele_names=c('nocall_all_possible_alleles_dropped_due_to_notSNPS'),called_snp_frame=called_snp_frame))
       }
     }
   }
@@ -643,7 +1024,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     cat('Returning a no call.\n')
     cat('POS: ', paste0(het_positions, collapse=', '))
     #het_positions <- intersect(het_positions, variant_positions)
-    return(list(distance='(0/1)',allele_names=c('nocall_het_call_at_invariant_pos')))
+    return(list(distance='(0/1)',allele_names=c('nocall_het_call_at_invariant_pos'),called_snp_frame=called_snp_frame))
   }
   
   called_snp_frame <- called_snp_frame[colnames(original_possible_allele_frame),]
@@ -694,7 +1075,7 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     n_alleles = 1
   }else{
     cat('\nNo rows in possible allele frame!!')
-    return(list(distance='(0/1)',allele_names=c('nocall_no_allele_differentiating_SNPS_left')))
+    return(list(distance='(0/1)',allele_names=c('nocall_no_allele_differentiating_SNPS_left'),called_snp_frame=called_snp_frame))
   }
   
   ## Single allele calling
@@ -737,11 +1118,13 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
     
     multi_rownames <- combinations(n=nrow(possible_allele_frame), r=n_alleles, v=rownames(possible_allele_frame))
     multi_rownames <- apply(multi_rownames,1,paste0,collapse='+')
-    multi_allele_distance_frame <- data.frame(matrix(nrow=length(multi_rownames),ncol=1),row.names=multi_rownames)
-    colnames(multi_allele_distance_frame) <- 'distance'
+    multi_allele_distance_frame <- data.frame(matrix(nrow=length(multi_rownames),ncol=3),row.names=multi_rownames)
+    colnames(multi_allele_distance_frame) <- c('distance','extra','missing')
     
     for(multi_allele_name in rownames(multi_allele_distance_frame)){
       allele_score <- 0
+      total_missed_snps <- 0
+      total_extra_snps <- 0
       allele_vector <- strsplit(multi_allele_name, '+', fixed=T)[[1]]
       
       allele_sequence <- possible_allele_frame[allele_vector,,drop=F]
@@ -757,12 +1140,26 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
         missed_snps <- length(setdiff(called_snp_vector, allele_snps))
         extra_snps <- length(setdiff(allele_snps,called_snp_vector))
         allele_score <- allele_score + missed_snps + extra_snps
+        total_missed_snps <- total_missed_snps + missed_snps
+        total_extra_snps <- total_extra_snps + extra_snps
       }
       multi_allele_distance_frame[multi_allele_name,1] <- allele_score + to_be_added_to_score
+      multi_allele_distance_frame[multi_allele_name,2] <- total_extra_snps
+      multi_allele_distance_frame[multi_allele_name,3] <- total_missed_snps
     }
     
-    min_allele_distance <- min(multi_allele_distance_frame)
-    min_allele_names <- rownames(multi_allele_distance_frame[multi_allele_distance_frame == min_allele_distance,,drop=F])
+    #min_missing_distance <- min(multi_allele_distance_frame$missing)
+    #min_allele_names <- rownames(multi_allele_distance_frame[multi_allele_distance_frame$missing == min_missing_distance,,drop=F])
+    
+    #min_extra_distance <- min(multi_allele_distance_frame[min_allele_names,'extra'])
+    #min_allele_names <- min_allele_names[multi_allele_distance_frame[min_allele_names,'extra'] == min_extra_distance]
+    
+    ## Subtracting the pentaly for having missing snps to makeup for taking out snps that do not pass the min_rounds threshold
+    ## to clarify the naming, 'extra' means extra snps in the called alleles that were not found in the called_snp_frame
+    #min_allele_distance <- min(multi_allele_distance_frame[min_allele_names,'distance'] - multi_allele_distance_frame[min_allele_names,'extra'])
+    min_allele_distance <- min(multi_allele_distance_frame$distance)
+    min_allele_names <- rownames(multi_allele_distance_frame[multi_allele_distance_frame$distance == min_allele_distance,,drop=F])
+    
     cat('\n')
     cat(min_allele_distance)
     cat('\n')
@@ -774,10 +1171,10 @@ allele_caller <- function(allele_calling_frame_list, possible_allele_frame, n_al
   return_min_allele_distance <- paste0('(', min_allele_distance, '/', base_allele_mismatch_scale, ')')
   
   if(min_allele_distance > 0){
-    return(list(distance=return_min_allele_distance,allele_names=c('new_does_not_perfectly_match_known_alleles')))
+    return(list(distance=return_min_allele_distance,allele_names=c('new_does_not_perfectly_match_known_alleles'),called_snp_frame=called_snp_frame))
   }
   
-  return(list(distance=return_min_allele_distance,allele_names=min_allele_names))
+  return(list(distance=return_min_allele_distance,allele_names=min_allele_names,called_snp_frame=NULL))
 }
 
 ## Make possible_allele_frame and locus specific vcf result frames to use with the allele_caller function
@@ -878,6 +1275,10 @@ read_blacklist <- function(allele_blacklist_path){
 prepare_gc_input <- function(raw.kff.file='',combined.csv.file='',results.directory=''){
   kff_results_table <- read.csv(raw.kff.file, stringsAsFactors = F, check.names = F)
   combined_table <- read.csv(combined.csv.file, stringsAsFactors = F, check.names = F, row.names = 1)
+  combined_table <- t(combined_table)
+  combined_table_append <- data.frame(matrix('0',2,ncol(combined_table)),stringsAsFactors=F,check.names=F,row.names=c('2DL2','2DL3'))
+  colnames(combined_table_append) <- colnames(combined_table)
+  combined_table<-rbind(combined_table, combined_table_append)
   
   ## only keep sample names that are found in both tables
   kff_samples <- rownames(kff_results_table)
@@ -1462,6 +1863,47 @@ ping_haplo_caller <- function(
   return(all_allele_calling_frame_list)
 }
 
+## This function reads in the all KIR alleles aligned fasta file, outputs a list of kir alleles
+read.all_kir_aligned_fasta <- function(fastaPath){
+  ## Make sure the fasta path is actually a file
+  fastaPath <- normalizePath(fastaPath, mustWork=T)
+  
+  ## Read in the fasta file
+  fastaFile <- file(fastaPath, open='r')
+  fileLines <- readLines(fastaFile)
+  
+  ## Initialize a list to store the alleles
+  alleleList <- list()
+  
+  ## Iterate over each line in the file
+  for(i in 1:length(fileLines)){
+    ## split each line by 'IPD', this should isolate allele name lines
+    currentLine <- strsplit(fileLines[i], 'IPD')[[1]]
+    
+    ## If the current line starts with '>', pull out the allele name and inialize a new list element
+    if(currentLine[1] == '>'){
+      alleleName <- strsplit(currentLine[2],' ')[[1]][2]
+      alleleList[[alleleName]] <- ''
+      
+      ## Otherwise add the current line to the previous list element
+    }else{
+      #print(currentLine)
+      alleleList[[alleleName]] <- paste0(alleleList[[alleleName]],currentLine)
+    }
+  }
+  
+  ## Close out the fasta file
+  close(fastaFile)
+  
+  ## If the max allele length and min allele lenght are not the same throw an error
+  if(max(unlist(lapply(alleleList, nchar))) != min(unlist(lapply(alleleList, nchar)))){
+    stop('KIR allele lengths from the aligned fasta are not all the same.')
+  }
+  
+  ## Return the completed list!
+  return(alleleList)
+}
+
 ## Speed-up stuff
 haplo_resources_directory <- 'Resources/haplo_resources'
 ipd_kir_resources_directory <- 'Resources/ipdkir_resources'
@@ -1470,5 +1912,6 @@ msf_directory <- 'Resources/ipdkir_resources/IPD_KIR_MSF_Files/Formatted_MSF_Fil
 
 kir_gen_path <- file.path(ipd_kir_resources_directory, 'genomic_sequence', 'KIR_gen.fasta')
 kir_nuc_path <- file.path(ipd_kir_resources_directory, 'genomic_sequence', 'KIR_nuc.fasta')
+all_aligned_kir_fasta_path <- file.path(ipd_kir_resources_directory, 'All_KIR_CDS_9-4-18.fas')
 
 

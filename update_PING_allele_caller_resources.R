@@ -29,6 +29,8 @@ update_caller_resources <- function(
   results.directory <- normalizePath(results.directory, mustWork = T)
   resource_location <- normalizePath(resource_location, mustWork = T)
   
+  # Allele Blacklist: alleles to exclude from formatted caller resource output
+  allele_blacklist <- c("KIR2DL1*005")
   
   ###################
   # FUNCTIONS --------------------------------------------------------
@@ -149,11 +151,13 @@ update_caller_resources <- function(
     # Format MSF as FASTA entries 
     nucleotides <- c('A','T','G','C')
     row_names_vec <- row.names(allele_frame.processed)
+    ## Filter out any alleles that are in the allele blacklist
+    row_names_vec <- row_names_vec[!row_names_vec %in% allele_blacklist]
     fasta_entries <- vector(mode="character", length = length(row_names_vec))
     
     # Format all non nucleotide BPs and fill in fasta_entries
     for(i in 1:length(row_names_vec)){
-      allele <- row_names_vec[i]
+      allele      <- row_names_vec[i]
       non_nuc_seq <- setdiff(allele_frame.processed[allele,],nucleotides)
       # Replace special characters ('*','.', etc.) with '-' for all positions in the Allele data frame
       if(length(non_nuc_seq) > 0){

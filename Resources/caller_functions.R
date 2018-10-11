@@ -491,50 +491,69 @@ genos_2DL23 <- function(genos.out){
   
   
   # Finding any 2DL2 alleles by finding the intersection of each 2DL2 call
-  if(length(vector_call_2DL2) == 3){
-    one <- unlist(strsplit(vector_call_2DL2, "/")[1])
-    two <- unlist(strsplit(vector_call_2DL2, "/")[2])
-    three <- unlist(strsplit(vector_call_2DL2, "/")[3])
-    
-    step_one <- intersect(two, three)
-    allele_one <- intersect(one, step_one)
-    
-  }else if(length(vector_call_2DL2) == 4){
-    one <- unlist(strsplit(vector_call_2DL2, "/")[1])
-    two <- unlist(strsplit(vector_call_2DL2, "/")[2])
-    three <- unlist(strsplit(vector_call_2DL2, "/")[3])
-    four <- unlist(strsplit(vector_call_2DL2, "/")[4])
-    
-    allele_one <- intersect(one, three)
-    allele_two <- intersect(two, four)
-    
-    if(length(allele_one) == 0 || length(allele_two) == 0){
-      allele_one <- intersect(one, four)
-      allele_two <- intersect(two, three)
+  if (!is.na(vector_call_2DL2[1])){
+    if (length(vector_call_2DL2) == 1){
+      allele_one <- unlist(strsplit(vector_call_2DL2,"/")[1])
+    }else if (length(vector_call_2DL2) == 2){
+      one <- unlist(strsplit(vector_call_2DL2,"/")[1])
+      two <- unlist(strsplit(vector_call_2DL2,"/")[2])
+      
+      allele_one <- intersect(one,two)
+      
+    }else if(length(vector_call_2DL2) == 3){
+      one <- unlist(strsplit(vector_call_2DL2, "/")[1])
+      two <- unlist(strsplit(vector_call_2DL2, "/")[2])
+      three <- unlist(strsplit(vector_call_2DL2, "/")[3])
+      
+      step_one <- intersect(two, three)
+      allele_one <- intersect(one, step_one)
+      
+    }else if(length(vector_call_2DL2) == 4){
+      one <- unlist(strsplit(vector_call_2DL2, "/")[1])
+      two <- unlist(strsplit(vector_call_2DL2, "/")[2])
+      three <- unlist(strsplit(vector_call_2DL2, "/")[3])
+      four <- unlist(strsplit(vector_call_2DL2, "/")[4])
+      
+      allele_one <- intersect(one, three)
+      allele_two <- intersect(two, four)
+      
+      if(length(allele_one) == 0 || length(allele_two) == 0){
+        allele_one <- intersect(one, four)
+        allele_two <- intersect(two, three)
+      }
     }
   }
   
   # Finding any 2DL3 alleles by finding the intersection of each 2DL3 call
-  if(length(vector_call_2DL3) == 3){
-    one <- unlist(strsplit(vector_call_2DL3, "/")[1])
-    two <- unlist(strsplit(vector_call_2DL3, "/")[2])
-    three <- unlist(strsplit(vector_call_2DL3, "/")[3])
-    
-    step_one <- intersect(two, three)
-    allele_two <- intersect(one, step_one)
-    
-  }else if(length(vector_call_2DL3) == 4){
-    one <- unlist(strsplit(vector_call_2DL3, "/")[1])
-    two <- unlist(strsplit(vector_call_2DL3, "/")[2])
-    three <- unlist(strsplit(vector_call_2DL3, "/")[3])
-    four <- unlist(strsplit(vector_call_2DL3, "/")[4])
-    
-    allele_one <- intersect(one, three)
-    allele_two <- intersect(two, four)
-    
-    if(length(allele_one) == 0 || length(allele_two) == 0){
-      allele_one <- intersect(one, four)
-      allele_two <- intersect(two, three)
+  if (!is.na(vector_call_2DL3[1])){
+    if (length(vector_call_2DL3) == 1){
+      allele_two <- unlist(strsplit(vector_call_2DL3,"/")[1])
+    }else if (length(vector_call_2DL3) == 2){
+      one <- unlist(strsplit(vector_call_2DL3, "/")[1])
+      two <- unlist(strsplit(vector_call_2DL3, "/")[2])
+      
+      allele_two <- intersect(one, two)
+    }else if(length(vector_call_2DL3) == 3){
+      one <- unlist(strsplit(vector_call_2DL3, "/")[1])
+      two <- unlist(strsplit(vector_call_2DL3, "/")[2])
+      three <- unlist(strsplit(vector_call_2DL3, "/")[3])
+      
+      step_one <- intersect(two, three)
+      allele_two <- intersect(one, step_one)
+      
+    }else if(length(vector_call_2DL3) == 4){
+      one <- unlist(strsplit(vector_call_2DL3, "/")[1])
+      two <- unlist(strsplit(vector_call_2DL3, "/")[2])
+      three <- unlist(strsplit(vector_call_2DL3, "/")[3])
+      four <- unlist(strsplit(vector_call_2DL3, "/")[4])
+      
+      allele_one <- intersect(one, three)
+      allele_two <- intersect(two, four)
+      
+      if(length(allele_one) == 0 || length(allele_two) == 0){
+        allele_one <- intersect(one, four)
+        allele_two <- intersect(two, three)
+      }
     }
   }
   
@@ -718,19 +737,52 @@ initialize_new_alleles_df <- function(resource.location){
   return(newAllelesDataFrames.list)
 }
 
+## Format simplified genotype string output from detailed newalleles output
+format_genos_newalleles_ouput_str <- function(current.locus,newalleles.output.df, sep = "_"){
+  genos_newalleles <- ""
+  
+  newallele_str <- paste(list("KIR",current.locus, sep,"new"),collapse = "")
+  
+  known_allele_list = c()
+  # Categories are in column 5
+  for(i in 1:nrow(newalleles.output.df)){
+    categ     <- newalleles.output.df[i,5]
+    poss_geno <- newalleles.output.df[i,4]
+    if (grepl("known", categ)){
+      known_allele <- unlist(strsplit(poss_geno,"\\+"))[2]
+      known_allele_list <- c(known_allele_list,known_allele)
+    } else{
+      next
+    }
+  }
+  
+  if (length(known_allele_list) != 0){
+    known_allele_list <- unique(known_allele_list)
+    known_allele_str <- paste(sort(known_allele_list),collapse = "/")
+    genos_newalleles <- paste(list(newallele_str,known_allele_str),collapse = "+")
+  } else{
+    genos_newalleles <- paste(list(newallele_str,newallele_str),collapse = "+")
+  }
+  
+  return(genos_newalleles)
+}
+
+
 
 ## Formatting name for New allele
-format_new_allele_name <- function(defining_new_allele_pos,Aref){
-  new_allele_name_list <- c(Aref,"_new")
+format_new_allele_name <- function(defining_new_allele_pos,current.locus){
+  new_allele_name_list <- c("KIR",current.locus,"_new")
   new_allele_pos_vec   <- names(defining_new_allele_pos)
   for(pos in new_allele_pos_vec){
     nuc <- defining_new_allele_pos[,pos]
     conv_pos <- gsub("X","",pos)
-    new_allele_name_list <- c(new_allele_name_list,conv_pos,nuc,".")
+    pos_and_nuc <- paste(c(as.character(conv_pos),as.character(nuc)), collapse = "")
+    new_allele_name_list <- c(new_allele_name_list,pos_and_nuc,".")
+    
   }
   new_allele_name <- paste(new_allele_name_list,collapse = "")
   new_allele_name <- substr(new_allele_name,1,nchar(new_allele_name)-1) # remove last char "."
-  
+
   return(new_allele_name)
 }
 
@@ -866,12 +918,17 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
     names(A2_seq_vec) <- pos_vec
     
     Aref <- ref_allele_names[grep(current.locus,ref_allele_names)]
+    # Vcf files for 2DL23 and 2DL3 should use a 2DL3 reference allele for proper positioning
+    if (current.locus == "2DL23"){
+      Aref <- ref_allele_names[grep("2DL3",ref_allele_names)]
+    }
     Aref_seq_vec <- SOS_locus_lookup_reads[SOS_locus_lookup_reads$allele == Aref,]
     Aref_seq_vec$allele <- NULL
     
     # Category of possible genotype
     categ_geno <- "new+known"
     if (A1 =="new" && A2 == "new"){categ_geno <- "new+new"}
+    if (A1 !="new" && A2 != "new"){categ_geno <- "known+known"}
     
     if (categ_geno == "new+known"){
       # Only one new allele detected in this possible genotype
@@ -887,7 +944,7 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
         # Convert Genomic positions to CDS positions
         names(defining_new_allele_pos) <- pos_vec_conv[names(defining_new_allele_pos)]
         # Generate new allele name and substitute it to replace 'new' flags
-        new_allele_name                <- format_new_allele_name(defining_new_allele_pos,Aref)
+        new_allele_name                <- format_new_allele_name(defining_new_allele_pos,current.locus)
         genos[i,1]                     <- new_allele_name
         poss_genotype                  <- c(genos[i,1],genos[i,2])
         poss_genotype                  <- paste(poss_genotype,collapse = "+")
@@ -922,7 +979,7 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
         # Convert Genomic positions to CDS positions
         names(defining_new_allele_pos) <- pos_vec_conv[names(defining_new_allele_pos)]
         # Generate new allele name and substitute it to replace 'new' flags
-        new_allele_name                <- format_new_allele_name(defining_new_allele_pos,Aref)
+        new_allele_name                <- format_new_allele_name(defining_new_allele_pos,current.locus)
         genos[i,2]                     <- new_allele_name
         poss_genotype                  <- c(genos[i,2],genos[i,1])
         poss_genotype                  <- paste(poss_genotype,collapse = "+")
@@ -943,7 +1000,7 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
         names(new_allele_entry)              <- as.character(pos_vec_conv)
         new_alleles_pos_var_df               <- rbind(new_alleles_pos_var_df, new_allele_entry)
       }
-    } else{
+    } else if (categ_geno == "new+new"){
       # No known allele detected in this possible genotype
       a1_comp_Aref_new_df <- rbind(Aref_seq_vec,A1_seq_vec)
       a1_unique_nuc_vec   <- apply(a1_comp_Aref_new_df,2, num_unique_nuc)
@@ -966,8 +1023,8 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
       names(a1_defining_new_allele_pos) <- pos_vec_conv[names(a1_defining_new_allele_pos)]
       names(a2_defining_new_allele_pos) <- pos_vec_conv[names(a2_defining_new_allele_pos)]
       # Generate new allele name and substitute it to replace 'new' flags
-      a1_new_allele_name                <- format_new_allele_name(a1_defining_new_allele_pos,Aref)
-      a2_new_allele_name                <- format_new_allele_name(a2_defining_new_allele_pos,Aref)
+      a1_new_allele_name                <- format_new_allele_name(a1_defining_new_allele_pos,current.locus)
+      a2_new_allele_name                <- format_new_allele_name(a2_defining_new_allele_pos,current.locus)
       genos[i,1]                        <- a1_new_allele_name
       genos[i,2]                        <- a2_new_allele_name
       
@@ -1086,7 +1143,10 @@ new_alleles_genos.vcf <- function(x, current.locus,DPthresh=6, mismatchThresh = 
     for (target_allele in row.names(oneoff.alleles.df)){
       curr_geno           <- unlist(strsplit(as.character(new_alleles_df[target_allele,2]),"+",fixed = T))
       nearest_allele      <- oneoff.alleles.df[target_allele,]
-      curr_geno[1]        <- nearest_allele
+      
+      # replace new allele that is close to a known allele with the known allele in the possible genotype 
+      #curr_geno[1]        <- nearest_allele
+      
       curr_geno           <- paste(curr_geno,collapse = "+")
       new_alleles_df[target_allele,2] <- curr_geno
       new_alleles_df[target_allele,3] <- nearest_allele 
@@ -1155,6 +1215,40 @@ get_typing.vcf <- function(x, current.locus,DPthresh = 6){
   allpos.df
 }
 
+
+# Remove Problematic SNP positions that are a product of contamination from a different locus
+#  - Verified through sanger sequencing experiments
+filter_contam_snps <- function(x,current.locus,KIR_sample_snps){
+  # 2DL1 Condition
+  if (current.locus == "2DL1"){
+    contam_snp_pos <- x[x$V2 %in% c("4950","4991","5011"),]
+    
+    # Except when: 4991=C or 5011=T
+    # check 4789
+    if (nrow(contam_snp_pos) > 0 && "5009" %in% KIR_sample_snps$position){
+      alt_call_4950 <- contam_snp_pos[contam_snp_pos$V2 == "4950",5]
+      if (alt_call_4950 == "A" | alt_call_4950 == "G"){
+        if ("4950" %in% KIR_sample_snps$position) {KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% "4950",]}
+        if ("5009" %in% KIR_sample_snps$position) {KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% "5009",]}
+      }
+    }
+    
+    # Additional condition
+    # - 
+    
+  }
+  
+  
+  # 3DL1S1 conditions: Removing 2DS4 contamination
+  #if (current.locus == "3DL1"){
+  #  target_positions.vcf <- x[x$V2 %in% c("1173","1184","1188"),]
+  #  # Get DP4 Counts
+  #  raw_DP4_vec <- tstrsplit(target_positions.vcf$V8,"DP4=")[[2]]
+  #  raw_DP4_vec <- tstrsplit(raw_DP4_vec,";")[[1]]
+  #}
+  
+  return(KIR_sample_snps)
+}
 
 
 ##==================================================================
@@ -1450,6 +1544,9 @@ allele_call.vcf <- function(x, sample,DPthresh = 6){
   if(is.null(KIR_sample_snps)){
     return(NULL)
   }
+  
+  ## Remove SNPs that are a product of contamination from another locus
+  KIR_sample_snps <- filter_contam_snps(x, current.locus, KIR_sample_snps)
   
   reads_pos <- paste0("X", KIR_sample_snps$position)
   
@@ -1928,45 +2025,116 @@ ping.caller <- function (sample, current.locus, DPthresh = 6) {
   no_types.list <- vcf_list.good[!names(vcf_list.good) %in% good_types]
   
   if(length(no_types.list) != 0){
-    
-    ## NEW ALLELES altered function: New alleles output converted into a genos string ------------
-    newalleles.output.df.list <- lapply(no_types.list, new_alleles_genos.vcf, current.locus=current.locus,DPthresh=DPthresh,mismatchThresh = 1)
-    
-    # unlist and combine all new allele info for this sample and locus
-    newalleles.output.colnames  <- names(newalleles.output.df.list[[1]])
-    newalleles.output.df        <- data.frame(matrix(nrow = 0, ncol = length(newalleles.output.colnames)))
-    names(newalleles.output.df) <- newalleles.output.colnames
-    if (!is.null(unlist(newalleles.output.df))){
-      newalleles.output.df <- do.call("rbind", newalleles.output.df.list)
-    }
-    
-    # Output new alleles results along with genos
-    if(file.exists(paste0(results.directory, "KIRcaller/snps_newalleles_", current.locus, ".txt"))) {
-      write.table(newalleles.output.df, paste0(results.directory, "KIRcaller/snps_newalleles_", current.locus, ".txt"), append = T, row.names=F, col.names=F, quote=F)
-    }else{
-      write.table(newalleles.output.df, paste0(results.directory, "KIRcaller/snps_newalleles_", current.locus, ".txt"), append = F,row.names=F, col.names=T, quote=F)
-    }
-    
-    # Write 'new' into genos output
-    write.table(paste0(sample_id," new"), paste0(results.directory, "KIRcaller/genos_", current.locus, ".txt"), append = T, row.names=F, col.names=F, quote=F)
-    
-    ##
-    
-    newalleles.out <- lapply(no_types.list, new_alleles.vcf, DPthresh=DPthresh)
-    
-    if(!is.null(unlist(newalleles.out))){
-      names(newalleles.out) <- names(no_types.list)
-      newalleles.df <- as.data.frame(do.call(rbind, newalleles.out))
-      newalleles.df$sample <- row.names(newalleles.df)
-      newalleles.df$sample <- row.names(newalleles.df)
-      newalleles.df$sample <- sapply(strsplit(newalleles.df$sample, "_"), "[", 1)
-      newalleles.df <- newalleles.df[,c(3,1,2)]
-      
-      if(file.exists(paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"))) {
-        write.table(newalleles.df, paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"), append = TRUE, row.names=F, col.names=F, quote=F)
-      }else{
-        write.table(newalleles.df, paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"), row.names=F, col.names=T, quote=F)
+    if (current.locus == "2DL23"){
+      if (nrow(genos.df) == 0){
+        ## NEW ALLELES altered function: New alleles output converted into a genos string ------------
+        newalleles.output.df.list <- list()
+        newalleles.output.df.list[["2DL23"]] <- list()
+        newalleles.output.df.list[["2DL2"]]  <- list()
+        for (vcf.name in names(no_types.list)){
+          locus.name <- unlist(strsplit(vcf.name,"_"))[length(unlist(strsplit(vcf.name,"_")))]
+          locus.name <- unlist(strsplit(locus.name,"nuc"))[1]
+          if (locus.name == "2DL3"){locus.name = "2DL23"}
+          vcf.frame <- no_types.list[[vcf.name]]
+          newalleles.output.df.list[[locus.name]][[vcf.name]] <- new_alleles_genos.vcf(vcf.frame,current.locus = locus.name,DPthresh = DPthresh,mismatchThresh = 1)
+          
+        }
+
+        # unlist and combine all new allele info for this sample and locus
+        all.newgenos.list <- c(sample_id)
+        for(locus in c("2DL23","2DL2")){
+          if (length(newalleles.output.df.list[[locus]]) > 0){
+            temp.newalleles.output.df.list <- newalleles.output.df.list[[locus]]
+            
+            newalleles.output.colnames  <- names(temp.newalleles.output.df.list[[1]])
+            newalleles.output.df        <- data.frame(matrix(nrow = 0, ncol = length(newalleles.output.colnames)))
+            names(newalleles.output.df) <- newalleles.output.colnames
+            if (!is.null(unlist(newalleles.output.df))){
+              newalleles.output.df <- do.call("rbind", temp.newalleles.output.df.list)
+            }
+            
+            # Output new alleles results along with genos
+            if(file.exists(paste0(results.directory, "KIRcaller/snps_newalleles_", locus, ".txt"))) {
+              write.table(newalleles.output.df, paste0(results.directory, "KIRcaller/snps_newalleles_", locus, ".txt"), append = T, row.names=F, col.names=F, quote=F)
+            }else{
+              write.table(newalleles.output.df, paste0(results.directory, "KIRcaller/snps_newalleles_", locus, ".txt"), append = F,row.names=F, col.names=T, quote=F)
+            }
+            
+            # Format a genos style output from new alleles results data frame
+            genos.newalleles  <- format_genos_newalleles_ouput_str(locus, newalleles.output.df)
+            all.newgenos.list <- c(all.newgenos.list,genos.newalleles)
+            
+            ##
+            
+          }
+        }
+        # Output to genos file
+        newalleles.genos.entry <- paste(all.newgenos.list,collapse = " ") 
+        write.table(newalleles.genos.entry, paste0(results.directory, "KIRcaller/genos_", current.locus, ".txt"), append = T, row.names=F, col.names=F, quote=F)
+        
+        
+        ### Older way of generating New alleles output
+        newalleles.out <- lapply(no_types.list, new_alleles.vcf, DPthresh=DPthresh)
+        
+        if(!is.null(unlist(newalleles.out))){
+          names(newalleles.out) <- names(no_types.list)
+          newalleles.df <- as.data.frame(do.call(rbind, newalleles.out))
+          newalleles.df$sample <- row.names(newalleles.df)
+          newalleles.df$sample <- row.names(newalleles.df)
+          newalleles.df$sample <- sapply(strsplit(newalleles.df$sample, "_"), "[", 1)
+          newalleles.df <- newalleles.df[,c(3,1,2)]
+          
+          if(file.exists(paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"))) {
+            write.table(newalleles.df, paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"), append = TRUE, row.names=F, col.names=F, quote=F)
+          }else{
+            write.table(newalleles.df, paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"), row.names=F, col.names=T, quote=F)
+          }
+        }
       }
+      
+    }else{
+      ## NEW ALLELES altered function: New alleles output converted into a genos string ------------
+      newalleles.output.df.list <- lapply(no_types.list, new_alleles_genos.vcf, current.locus=current.locus,DPthresh=DPthresh,mismatchThresh = 1)
+      
+      # unlist and combine all new allele info for this sample and locus
+      newalleles.output.colnames  <- names(newalleles.output.df.list[[1]])
+      newalleles.output.df        <- data.frame(matrix(nrow = 0, ncol = length(newalleles.output.colnames)))
+      names(newalleles.output.df) <- newalleles.output.colnames
+      if (!is.null(unlist(newalleles.output.df))){
+        newalleles.output.df <- do.call("rbind", newalleles.output.df.list)
+      }
+      
+      # Output new alleles results along with genos
+      if(file.exists(paste0(results.directory, "KIRcaller/snps_newalleles_", current.locus, ".txt"))) {
+        write.table(newalleles.output.df, paste0(results.directory, "KIRcaller/snps_newalleles_", current.locus, ".txt"), append = T, row.names=F, col.names=F, quote=F)
+      }else{
+        write.table(newalleles.output.df, paste0(results.directory, "KIRcaller/snps_newalleles_", current.locus, ".txt"), append = F,row.names=F, col.names=T, quote=F)
+      }
+      
+      # Format a genos style output from new alleles results data frame
+      genos.newalleles       <- format_genos_newalleles_ouput_str(current.locus, newalleles.output.df)
+      newalleles.genos.entry <- paste(list(sample_id,genos.newalleles),collapse = " ") 
+      write.table(newalleles.genos.entry, paste0(results.directory, "KIRcaller/genos_", current.locus, ".txt"), append = T, row.names=F, col.names=F, quote=F)
+      
+      ##
+      
+      newalleles.out <- lapply(no_types.list, new_alleles.vcf, DPthresh=DPthresh)
+      
+      if(!is.null(unlist(newalleles.out))){
+        names(newalleles.out) <- names(no_types.list)
+        newalleles.df <- as.data.frame(do.call(rbind, newalleles.out))
+        newalleles.df$sample <- row.names(newalleles.df)
+        newalleles.df$sample <- row.names(newalleles.df)
+        newalleles.df$sample <- sapply(strsplit(newalleles.df$sample, "_"), "[", 1)
+        newalleles.df <- newalleles.df[,c(3,1,2)]
+        
+        if(file.exists(paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"))) {
+          write.table(newalleles.df, paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"), append = TRUE, row.names=F, col.names=F, quote=F)
+        }else{
+          write.table(newalleles.df, paste0(results.directory, "KIRcaller/newalleles_", current.locus, ".txt"), row.names=F, col.names=T, quote=F)
+        }
+      }
+      
     }
   }
   
