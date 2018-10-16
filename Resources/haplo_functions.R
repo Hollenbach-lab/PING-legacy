@@ -1553,7 +1553,7 @@ ping_haplo_caller <- function(
 ){
   library(data.table)
   library(stringr)
-  source("Resources/haplo_functions.R", local = TRUE)
+  #source("Resources/haplo_functions.R", local = TRUE)
   
   vcf_threshold = 0.1
   allele_threshold = 0.85

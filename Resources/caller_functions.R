@@ -199,6 +199,13 @@ snps_gen.vcf <- function(current.locus){
   # Remove these postions
   SOS_locus_lookup[,pos_to_exclude] <- NULL
   
+  # 2DL4 condition: for CDS position 811 (genomic position 9887), there is deletion and as a result this position should be an 'A'
+  if (current.locus == "2DL4"){
+    target_pos_vec <- SOS_locus_lookup[,grep("811",names(SOS_locus_lookup))]
+    target_pos_vec[!is_nuc(target_pos_vec)] <- "A"
+    SOS_locus_lookup[,grep("811",names(SOS_locus_lookup))] <- target_pos_vec
+  }
+  
   # Output Variable Positions prior to conversion to genomic positions
   write.table(SOS_locus_lookup, paste0(results.directory, "KIRcaller/KIR_", current.locus, "_alleles.txt"), quote = FALSE, row.names = FALSE)
   
@@ -1223,8 +1230,11 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps){
   if (current.locus == "2DL1"){
     contam_snp_pos <- x[x$V2 %in% c("4950","4991","5011"),]
     
-    # Except when: 4991=C or 5011=T
-    # check 4789
+    ## Additional Conditions
+    # 1. Except when: 4991=C or 5011=T, in those cases do not remove position 5009
+    # 2. Position 4789: if this position is present with a 'G', 
+    #                   then substract the read depth of 5009 from 4789
+    #                   if depth(5009) > depth(4789), then make depth(4789) = 0
     if (nrow(contam_snp_pos) > 0 && "5009" %in% KIR_sample_snps$position){
       alt_call_4950 <- contam_snp_pos[contam_snp_pos$V2 == "4950",5]
       if (alt_call_4950 == "A" | alt_call_4950 == "G"){
