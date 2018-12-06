@@ -1225,26 +1225,155 @@ get_typing.vcf <- function(x, current.locus,DPthresh = 6){
 
 # Remove Problematic SNP positions that are a product of contamination from a different locus
 #  - Verified through sanger sequencing experiments
-filter_contam_snps <- function(x,current.locus,KIR_sample_snps){
+filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.20){
   # 2DL1 Condition
   if (current.locus == "2DL1"){
-    contam_snp_pos <- x[x$V2 %in% c("4950","4991","5011"),]
+    # 14933 & 15179 is 2DL2 contamination that arises because of 2DL2 reads aligning to 2DL1*005 (allele that is not real), Pauls bowtie reference has 005
+    #   - These two positions were validated by Danillo after resequencing several individuals
+    contam_snp_pos <- x[x$V2 %in% c("4788","4950","4991","5009","5011","14933","15179"),]
+    
+    # Set up data frame to assess the presence of a block of 2DS1 contamination 
+    #block_contam_snp_pos <- x[x$V2 %in% c("6614","6733","6759","6760","6786","6818","10072","14418"),]
+    block_pos_list       <- c("6733","6759","6760","6786","6818","10072")
+    block_contam_snp_pos <- x[x$V2 %in% block_pos_list,]
+    
+    refR1_vec <- c()
+    refR2_vec <- c()
+    altR1_vec <- c()
+    altR2_vec <- c()
+    
+    block_dp4 <- tstrsplit(tstrsplit(block_contam_snp_pos$V8,"DP4=")[[2]],";")[[1]]
+    for(i in 1:length(block_dp4)){
+      dp4_vec <- unlist(strsplit(block_dp4[i],","))
+      refR1_vec <- c(refR1_vec, as.numeric(dp4_vec[1]))
+      refR2_vec <- c(refR2_vec,as.numeric(dp4_vec[2]))
+      altR1_vec <- c(altR1_vec,as.numeric(dp4_vec[3]))
+      altR2_vec <- c(altR2_vec,as.numeric(dp4_vec[4]))
+      
+    }
+    
+    block_contam_snp_pos$RefR1 <- refR1_vec
+    block_contam_snp_pos$RefR2 <- refR2_vec
+    block_contam_snp_pos$AltR1 <- altR1_vec
+    block_contam_snp_pos$AltR2 <- altR2_vec
     
     ## Additional Conditions
     # 1. Except when: 4991=C or 5011=T, in those cases do not remove position 5009
-    # 2. Position 4789: if this position is present with a 'G', 
-    #                   then substract the read depth of 5009 from 4789
+    # 2. Position 4788: if this position is present with a 'G', 
+    #                   then substract the read depth of 5009 from 4788, and remove the 'G' call from pos 4788
     #                   if depth(5009) > depth(4789), then make depth(4789) = 0
+    
+    alt_call_4950 <- contam_snp_pos[contam_snp_pos$V2 == "4950",5]
+    alt_call_4991 <- contam_snp_pos[contam_snp_pos$V2 == "4991",5]
+    alt_call_5011 <- contam_snp_pos[contam_snp_pos$V2 == "5011",5]
+    presence_2DS1 <- FALSE
+    if (alt_call_4950 == "A" | alt_call_4950 == "G"){presence_2DS1 <- TRUE}
+    
     if (nrow(contam_snp_pos) > 0 && "5009" %in% KIR_sample_snps$position){
-      alt_call_4950 <- contam_snp_pos[contam_snp_pos$V2 == "4950",5]
-      if (alt_call_4950 == "A" | alt_call_4950 == "G"){
+      if (presence_2DS1){
         if ("4950" %in% KIR_sample_snps$position) {KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% "4950",]}
-        if ("5009" %in% KIR_sample_snps$position) {KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% "5009",]}
+        if ("5009" %in% KIR_sample_snps$position) {
+          # If 4991=C (Ref = A) or 5011=T (Ref = G), keep 5009
+          if (alt_call_4991 == "C" | alt_call_5011 == "T"){
+            KIR_sample_snps <- KIR_sample_snps
+          } else{
+            KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% "5009",]
+          }
+        }
+        
       }
     }
     
     # Additional condition
-    # - 
+    # - Remove contamination from position 4788 (G)
+    dp4_4950 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "4950",8])
+    dp4_4950 <- unlist(strsplit(dp4_4950, "DP4="))[2]
+    dp4_4950 <- unlist(strsplit(dp4_4950, ";"))[1]
+    dp4_4950 <- as.integer(unlist(strsplit(dp4_4950,",")))
+    dp4_4950_ref <- dp4_4950[1] + dp4_4950[2]
+    dp4_4950_alt <- dp4_4950[3] + dp4_4950[4]
+    
+    ref_call_4788 <- contam_snp_pos[contam_snp_pos$V2 == "4788",4]
+    alt_call_4788 <- contam_snp_pos[contam_snp_pos$V2 == "4788",5]
+    dp4_4788 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "4788",8])
+    dp4_4788 <- unlist(strsplit(dp4_4788, "DP4="))[2]
+    dp4_4788 <- unlist(strsplit(dp4_4788, ";"))[1]
+    dp4_4788 <- as.integer(unlist(strsplit(dp4_4788,",")))
+    dp4_4788_ref <- dp4_4788[1] + dp4_4788[2]
+    dp4_4788_alt <- dp4_4788[3] + dp4_4788[4]
+
+    dp4_5009 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "5009",8])
+    dp4_5009 <- unlist(strsplit(dp4_5009, "DP4="))[2]
+    dp4_5009 <- unlist(strsplit(dp4_5009, ";"))[1]
+    dp4_5009 <- as.integer(unlist(strsplit(dp4_5009,",")))
+    dp4_5009_ref <- dp4_5009[1] + dp4_5009[2]
+    
+    # Remove contamination "G" from position 4788
+    # subtracted DP4 of 4950 alt call (A or G) from 4788 alt call (C) 
+    # If less that 20% of DP4 remains for 4788 alt call after subtraction, force reference call
+    ## FIX THIS CONDITION based on the above statements: (Ask Danillo, removing contam G should involve substracting from ref call not alt call?)
+    if (presence_2DS1 && ref_call_4788 == "G"){
+      dp4_thresh_4788 <- PctFilter2DL1 * dp4_4788_ref
+      diff_4950_vs_4788 <- 0
+      if (dp4_4950_alt >= dp4_4788_ref){
+        diff_4950_vs_4788 <- 0
+      }else {
+        diff_4950_vs_4788 <- dp4_4788_ref - dp4_4950_alt
+      }
+      
+      force_ref_call <- FALSE
+      if (diff_4950_vs_4788 < dp4_thresh_4788){force_ref_call <- TRUE}
+      
+      # Force reference call for 4788 if status = TRUE
+      if (force_ref_call){
+        entry_4788 <- KIR_sample_snps[KIR_sample_snps$position == "4788",]
+        entry_4788$snp1call <- entry_4788$var
+        entry_4788$snp2call <- entry_4788$var
+      
+        KIR_sample_snps[KIR_sample_snps$position == "4788",] <- entry_4788
+      }
+      
+    }
+    
+    ## Handling Block of contaminated SNP positions introduced by 2DS1
+    # Block conditions:
+    # - if every positon in the block has an alt call (6 total), remove these positions from consideration
+    # - if one or more (but not all) of the block has an alt call force reference calls
+    if (presence_2DS1){
+      block_presence <- TRUE
+      make_block_ref <- FALSE
+      remove_block   <- TRUE
+      for(alt_bp in block_contam_snp_pos$V5){
+        if (!is_nuc(alt_bp)){
+          make_block_ref <- TRUE
+          remove_block   <- FALSE
+          block_presence <- FALSE
+        }
+      }
+      
+      
+      # NOT USING CURRENTLY: Extract the depth of 6614, if there is no T force alt call of C and force reference
+      #ref_r1_6614 <- block_contam_snp_pos[block_contam_snp_pos$V2 == "6614",11]
+      #ref_r2_6614 <- block_contam_snp_pos[block_contam_snp_pos$V2 == "6614",12]
+      #if (ref_r1_6614 == "0" & ref_r2_6614 == "0"){
+      #  # If T not present replace snp call 1 and 2 with C
+      #  KIR_sample_snps[KIR_sample_snps$position == "6614",c(10,11)] <- "C"
+      #  make_block_ref <- TRUE
+      #}
+      
+      # If at least one SNP is missing in the block, it is 2DS1 contamination, 
+      # so the reference calls can be force, otherwise remove all block positions from calling
+      if(make_block_ref){
+        # If block is present, force reference calls, since 4950 is A/G, 2DS1 is present
+        subset_KIR_sample_snps<- KIR_sample_snps[KIR_sample_snps$position %in% block_pos_list,]
+        subset_KIR_sample_snps$snp2call <- subset_KIR_sample_snps$snp1call
+        KIR_sample_snps[KIR_sample_snps$position %in% block_pos_list,] <- subset_KIR_sample_snps
+      }else if (block_presence && remove_block){
+        KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% block_pos_list,]
+      }
+      
+    }
+
     
   }
   

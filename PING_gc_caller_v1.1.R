@@ -856,4 +856,3 @@ ping_recalc <- function(
 
 }
 
-ping_gc_caller()
