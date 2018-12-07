@@ -1275,7 +1275,7 @@ read_blacklist <- function(allele_blacklist_path){
 prepare_gc_input <- function(raw.kff.file='',combined.csv.file='',results.directory=''){
   kff_results_table <- read.csv(raw.kff.file, stringsAsFactors = F, check.names = F)
   combined_table <- read.csv(combined.csv.file, stringsAsFactors = F, check.names = F, row.names = 1)
-  combined_table <- t(combined_table)
+  #combined_table <- t(combined_table)
   combined_table_append <- data.frame(matrix('0',2,ncol(combined_table)),stringsAsFactors=F,check.names=F,row.names=c('2DL2','2DL3'))
   colnames(combined_table_append) <- colnames(combined_table)
   combined_table<-rbind(combined_table, combined_table_append)

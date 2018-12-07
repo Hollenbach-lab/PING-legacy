@@ -84,12 +84,12 @@ ping_haplo <- function(
   
   ## Initialize list for storing what samples are skipped
   skipped_samples <- c()
-  for(sample_id in sample_list[13:length(sample_list)]){
+  for(sample_id in sample_list){
     cat('\n\n')
     cat(sample_id, '\n')
     
-    distance_frame <- read.table(file.path(results.directory, 'distance_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
-    type_frame <- read.table(file.path(results.directory, 'type_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
+    #distance_frame <- read.table(file.path(results.directory, 'distance_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
+    #type_frame <- read.table(file.path(results.directory, 'type_frame.csv'), stringsAsFactors = F, sep = ',',check.names = F)
     #gc_frame <- read.table(file.path(results.directory, 'gc_frame.csv'),stringsAsFactors = F,sep=',',check.names=F)
     
     ## These two lines are unnecessary unless reading in the tables from file (previous three commented lines)
