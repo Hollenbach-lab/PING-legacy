@@ -2035,10 +2035,12 @@ get_calls.vcf <- function(x, DPthresh = 6){
 ping.caller <- function (sample, current.locus, DPthresh = 6) {
   
   # Format Sample ID for Genotype output
-  sample_id <- unlist(strsplit(sample,"_"))[1]
-  if(grepl("_", copy_number)){
-    sample_id <- paste0(sample_id, "*")
-  }
+  sample_id <- sample
+  # INDIGO specific modification
+  #sample_id <- unlist(strsplit(sample,"_"))[1]
+  #if(grepl("_", copy_number)){
+  #  sample_id <- paste0(sample_id, "*")
+  #}
   
   
   # Read in vcf files and check if they are good ----------------------------
