@@ -37,10 +37,6 @@ ping_haplo <- function(
   ## Read in thegc_input.csv file
   master_gc_table <- read_master_gc(gc_input_path)
   
-  ##  ADD WAY TO INPUT MASTER GC TABLE FOR ALL SAMPLES ##
-  
-  
-  
   cat('\nReading in allele references\n')
   ## Reading in the reference allele name table
   master_haplo_table <- read_master_haplo(master_haplo_path)

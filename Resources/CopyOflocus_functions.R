@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PING.  If not, see <http://www.gnu.org/licenses/>.
-
+'/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2'
 # VCF creation functions
 KIR_2DL1 <- function(sequence, is_gz) {
   
@@ -50,9 +50,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
     bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL1S1in.fastq")
     bt2_sam <- paste0("-S ", sequence, ".temp")
     
-    bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+    bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
     cat("\n", bowtie2_var, "\n")
-    system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+    system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
     cat("\n")
     
     # First neg filter
@@ -65,9 +65,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
     bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL1.fastq")
     bt2_sam <- paste0("-S ", sequence, ".temp")
     
-    bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+    bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
     cat(bowtie2_var,"\n")
-    system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+    system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
     cat("\n")
     
     # Final alignment
@@ -79,9 +79,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
     bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL1.fastq")
     bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
     
-    bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+    bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
     cat(bowtie2_var,"\n")
-    system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+    system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
     cat("\n")
     
   }else{
@@ -104,9 +104,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL1S1in.fastq")
       bt2_sam <- paste0("-S ", sequence, ".temp")
       
-      bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
       cat("\n", bowtie2_var, "\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
       cat("\n")
       
       # First neg filter
@@ -119,9 +119,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL1.fastq")
       bt2_sam <- paste0("-S ", sequence, ".temp")
       
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
       cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
       cat("\n")
       
       # Second neg filter
@@ -134,9 +134,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_un_conc <- paste0("--un-conc ", sequence,"_KIR2DL1b.fastq")
       bt2_sam <- paste0("-S ", sequence, ".temp")
       
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
       cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
       cat("\n")
       
       # Final alignment
@@ -148,9 +148,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL1.fastq")
       bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
       
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
       cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
       cat("\n")
       
       file.remove(paste0(sequence, "_KIR2DL1b.1.fastq"))
@@ -173,9 +173,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL1S1in.fastq")
       bt2_sam <- paste0("-S ", sequence, ".temp")
       
-      bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
       cat("\n", bowtie2_var, "\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
       cat("\n")
       
       # First neg filter
@@ -188,9 +188,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_un_conc <- paste0("--un-conc ", sequence,"_KIR2DL1.fastq")
       bt2_sam <- paste0("-S ", sequence, ".temp")
       
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
       cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
       cat("\n")
       
       # Second neg filter
@@ -203,9 +203,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL1b.fastq")
       bt2_sam <- paste0("-S ", sequence, ".temp")
       
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
       cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
       cat("\n")
       
       # Final alignment
@@ -217,9 +217,9 @@ KIR_2DL1 <- function(sequence, is_gz) {
       bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL1.fastq")
       bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
       
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+      bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
       cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+      system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
       cat("\n")
       
       file.remove(paste0(sequence, "_KIR2DL1b.1.fastq"))
@@ -285,281 +285,6 @@ KIR_2DL1 <- function(sequence, is_gz) {
   file.remove(paste0(sequence,"_notmapped.2.fastq"))
 }
 
-
-KIR_2DL1_Genomic <- function(sequence, is_gz) {
-  
-  if(is_gz){
-    fastq.pattern.1 <- unlist(strsplit(fastq.pattern.1, ".gz", fixed = TRUE))
-    fastq.pattern.2 <- unlist(strsplit(fastq.pattern.2, ".gz", fixed = TRUE))
-    
-    cut_fastq(paste0(sample.location, sequence, fastq.pattern.1, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
-    cut_fastq(paste0(sample.location, sequence, fastq.pattern.2, ".gz"), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
-  }else{
-    cut_fastq(paste0(sample.location, sequence, fastq.pattern.1), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is_gz)
-    cut_fastq(paste0(sample.location, sequence, fastq.pattern.2), read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2), is_gz)
-  }
-  
-  #sapply(paste0(sample.location, sequence, fastq.pattern.1), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.1), is.gz = is_gz)
-  #sapply(paste0(sample.location, sequence, fastq.pattern.2), cut_fastq, read.cap = 240000, post.file.name = paste0(sequence, fastq.pattern.2))
-  
-  if(!"2DS1" %in% loci.list){
-    
-    # First pos filter
-    bt2_fastq <- "-q"
-    bt2_thread_parameter <- paste0("-p", bowtie.threads)
-    bt2_5 <- "-5 3"
-    bt2_3 <- "-3 7"
-    bt2_L <- "-L 20"
-    bt2_i <- "-i S,1,0.5"
-    bt2_score_min <- "--score-min L,0,-0.187"
-    bt2_I <- "-I 75"
-    bt2_X <- "-X 1000"
-    bt2_index <- "-x Resources/caller_resources/Filters/2DL1/All2DL1S1gen"
-    bt2_sequence_1 <- paste0("-1 ", sequence, fastq.pattern.1)
-    bt2_sequence_2 <- paste0("-2 ", sequence, fastq.pattern.2)
-    bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL1S1in.fastq")
-    bt2_sam <- paste0("-S ", sequence, ".temp")
-    
-    bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
-    cat("\n", bowtie2_var, "\n")
-    system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
-    cat("\n")
-    
-    # First neg filter
-    bt2_5 <- "-5 3"
-    bt2_3 <- "-3 7"
-    bt2_score_min <- "--score-min L,0,-0.155"
-    bt2_index <- "-x Resources/caller_resources/Filters/2DL1/not2DL1S1"
-    bt2_sequence_1 <- paste0("-1 ","r",sequence,"_2DL1S1in.1.fastq")
-    bt2_sequence_2 <- paste0("-2 ","r",sequence,"_2DL1S1in.2.fastq")
-    bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL1.fastq")
-    bt2_sam <- paste0("-S ", sequence, ".temp")
-    
-    bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
-    cat(bowtie2_var,"\n")
-    system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
-    cat("\n")
-    
-    # Final alignment
-    bt2_score_min <- "--score-min L,0,-0.55"
-    bt2_index <- "-x Resources/caller_resources/Filters/2DL1/2DL1AClong"
-    bt2_sequence_1 <- paste0("-1 ", sequence,"_KIR2DL1.1.fastq")
-    bt2_sequence_2 <- paste0("-2 ", sequence,"_KIR2DL1.2.fastq")
-    bt2_sam <- paste0("-S ",sequence,"_2DL1.sam")
-    bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL1.fastq")
-    bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
-    
-    bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
-    cat(bowtie2_var,"\n")
-    system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
-    cat("\n")
-    
-  }else{
-    kff_results <- ping.kff(sequence, "2DL1", "Resources/caller_resources/KFF_2DL1.txt", 10)
-    if((kff_results["2DL14and7"] == 1) || (kff_results["2DL14710b"] == 1)){
-      
-      # First pos filter
-      bt2_fastq <- "-q"
-      bt2_thread_parameter <- paste0("-p", bowtie.threads)
-      bt2_5 <- "-5 3"
-      bt2_3 <- "-3 7"
-      bt2_L <- "-L 20"
-      bt2_i <- "-i S,1,0.5"
-      bt2_score_min <- "--score-min L,0,-0.187"
-      bt2_I <- "-I 75"
-      bt2_X <- "-X 1000"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/All2DL1S1gen"
-      bt2_sequence_1 <- paste0("-1 ", sequence, fastq.pattern.1)
-      bt2_sequence_2 <- paste0("-2 ", sequence, fastq.pattern.2)
-      bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL1S1in.fastq")
-      bt2_sam <- paste0("-S ", sequence, ".temp")
-      
-      bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
-      cat("\n", bowtie2_var, "\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
-      cat("\n")
-      
-      # First neg filter
-      bt2_5 <- "-5 3"
-      bt2_3 <- "-3 7"
-      bt2_score_min <- "--score-min L,0,-0.155"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/not2DL1S1"
-      bt2_sequence_1 <- paste0("-1 ","r",sequence,"_2DL1S1in.1.fastq")
-      bt2_sequence_2 <- paste0("-2 ","r",sequence,"_2DL1S1in.2.fastq")
-      bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL1.fastq")
-      bt2_sam <- paste0("-S ", sequence, ".temp")
-      
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
-      cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
-      cat("\n")
-      
-      # Second neg filter
-      bt2_5 <- "-5 3"
-      bt2_3 <- "-3 7"
-      bt2_score_min <- "--score-min L,0,-0.153"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/2DS1gen"
-      bt2_sequence_1 <- paste0("-1 ", sequence,"_KIR2DL1.1.fastq")
-      bt2_sequence_2 <- paste0("-2 ", sequence,"_KIR2DL1.2.fastq")
-      bt2_un_conc <- paste0("--un-conc ", sequence,"_KIR2DL1b.fastq")
-      bt2_sam <- paste0("-S ", sequence, ".temp")
-      
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
-      cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
-      cat("\n")
-      
-      # Final alignment
-      bt2_score_min <- "--score-min L,0,-0.55"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/2DL1AClong"
-      bt2_sequence_1 <- paste0("-1 ", sequence,"_KIR2DL1b.1.fastq")
-      bt2_sequence_2 <- paste0("-2 ", sequence,"_KIR2DL1b.2.fastq")
-      bt2_sam <- paste0("-S ",sequence,"_2DL1.sam")
-      bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL1.fastq")
-      bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
-      
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
-      cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
-      cat("\n")
-      
-      file.remove(paste0(sequence, "_KIR2DL1b.1.fastq"))
-      file.remove(paste0(sequence, "_KIR2DL1b.2.fastq"))
-    }else if((kff_results["2DL14and7"] == 0) && (kff_results["2DL14710b"] == 0)){
-      
-      # Pos filter
-      bt2_fastq <- "-q"
-      bt2_thread_parameter <- paste0("-p", bowtie.threads)
-      bt2_5 <- "-5 3"
-      bt2_3 <- "-3 7"
-      bt2_L <- "-L 20"
-      bt2_i <- "-i S,1,0.5"
-      bt2_score_min <- "--score-min L,0,-0.187"
-      bt2_I <- "-I 75"
-      bt2_X <- "-X 1000"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/All2DL1S1gen"
-      bt2_sequence_1 <- paste0("-1 ", sequence, fastq.pattern.1)
-      bt2_sequence_2 <- paste0("-2 ", sequence, fastq.pattern.2)
-      bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL1S1in.fastq")
-      bt2_sam <- paste0("-S ", sequence, ".temp")
-      
-      bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
-      cat("\n", bowtie2_var, "\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
-      cat("\n")
-      
-      # First neg filter
-      bt2_5 <- "-5 3"
-      bt2_3 <- "-3 7"
-      bt2_score_min <- "--score-min L,0,-0.155"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/not2DL1S1"
-      bt2_sequence_1 <- paste0("-1 ","r", sequence,"_2DL1S1in.1.fastq")
-      bt2_sequence_2 <- paste0("-2 ","r", sequence,"_2DL1S1in.2.fastq")
-      bt2_un_conc <- paste0("--un-conc ", sequence,"_KIR2DL1.fastq")
-      bt2_sam <- paste0("-S ", sequence, ".temp")
-      
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
-      cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
-      cat("\n")
-      
-      # Second neg filter
-      bt2_5 <- "-5 3"
-      bt2_3 <- "-3 7"
-      bt2_score_min <- "--score-min L,0,-0.18"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/2DS1gen"
-      bt2_sequence_1 <- paste0("-1 ", sequence,"_KIR2DL1.1.fastq")
-      bt2_sequence_2 <- paste0("-2 ", sequence,"_KIR2DL1.2.fastq")
-      bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL1b.fastq")
-      bt2_sam <- paste0("-S ", sequence, ".temp")
-      
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
-      cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
-      cat("\n")
-      
-      # Final alignment
-      bt2_score_min <- "--score-min L,0,-0.55"
-      bt2_index <- "-x Resources/caller_resources/Filters/2DL1/2DL1AClong"
-      bt2_sequence_1 <- paste0("-1 ", sequence,"_KIR2DL1b.1.fastq")
-      bt2_sequence_2 <- paste0("-2 ", sequence,"_KIR2DL1b.2.fastq")
-      bt2_sam <- paste0("-S ",sequence,"_2DL1.sam")
-      bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL1.fastq")
-      bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
-      
-      bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
-      cat(bowtie2_var,"\n")
-      system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
-      cat("\n")
-      
-      file.remove(paste0(sequence, "_KIR2DL1b.1.fastq"))
-      file.remove(paste0(sequence, "_KIR2DL1b.2.fastq"))
-    }
-  }
-  
-  st_b <- "-b"
-  st_q <- "-q10"
-  st_in <- paste0(sequence,"_2DL1.sam")
-  st_out <- paste0("-o ",sequence,"_2DL1.bam")
-  
-  st_view <- paste("samtools view",st_b,st_q,st_in,st_out)
-  cat(st_view,"\n")
-  system2("samtools", c("view", st_b, st_q, st_in, st_out))
-  cat("\n")
-  
-  st_out <- paste0("-o ",sequence,"_2DL1.sorted.bam")
-  st_T <- paste0("-T temp")
-  st_in <- paste0(sequence,"_2DL1.bam")
-  
-  st_sort <- paste("samtools sort",st_out,st_T,st_in)
-  cat(st_sort,"\n")
-  system2("samtools", c("sort", st_out, st_T, st_in))
-  cat("\n")
-  
-  st_m <- "-m 3"
-  st_F <- "-F 0.0002"
-  st_u <- "-u"
-  st_f <- "-f Resources/caller_resources/Filters/2DL1/2DL1AClong.fas"
-  st_in <- paste0(sequence,"_2DL1.sorted.bam")
-  st_l <- "-l Resources/caller_resources/Filters/2DL1/2DL1AClong.bed"
-  st_break <- "|"
-  bcf_call <- "bcftools call"
-  bcf_multi_al <- "--multiallelic-caller"
-  bcf_O <- "-O v"
-  bcf_out <- paste0("-o ", sequence, "_2DL1nuc.vcf")
-  
-  cat("\n")
-  #st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_l,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
-  #system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
-  
-  st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
-  cat(st_mpileup_bcf_call,"\n")
-  system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
-  cat("\n")
-  
-  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DL1cons.fastq")))
-  
-  #file.copy(paste0(sequence, "_2DL1.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.1.fastq"))
-  #file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.2.fastq"))
-  
-  file.copy(paste0(sequence, "_2DL1nuc.vcf"), paste0(results.directory, "Vcf_Genomic/", sequence, "_2DL1nuc.vcf"))
-  
-  file.remove(paste0(sequence, "_2DL1nuc.vcf"))
-  file.remove(paste0("r",sequence,"_2DL1S1in.1.fastq"))
-  file.remove(paste0("r",sequence,"_2DL1S1in.2.fastq"))
-  file.remove(paste0(sequence,"_2DL1.1.fastq"))
-  file.remove(paste0(sequence,"_2DL1.2.fastq"))
-  file.remove(paste0(sequence,"_2DL1.sam"))
-  file.remove(paste0(sequence,"_2DL1.bam"))
-  file.remove(paste0(sequence,"_2DL1.sorted.bam"))
-  file.remove(paste0(sequence,"_KIR2DL1.1.fastq"))
-  file.remove(paste0(sequence,"_KIR2DL1.2.fastq"))
-  file.remove(paste0(sequence,".temp"))
-  file.remove(paste0(sequence,"_notmapped.1.fastq"))
-  file.remove(paste0(sequence,"_notmapped.2.fastq"))
-}
-
-
 KIR_2DL23 <- function(sequence, is_gz) {
   
   if(is_gz){
@@ -594,9 +319,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL23in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   ## Negative filter
@@ -609,9 +334,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL23.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   ## Removes everything that could be 2DS2
@@ -624,9 +349,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL23_notS2.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   ## Remove 2DL3 tail
@@ -639,9 +364,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_2DL2_notL3tail.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   ## 2DL2 alignment
@@ -653,9 +378,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL2.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   ## 2DL2 VCF generation
@@ -712,9 +437,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL23.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   ## 2DL23 VCF generation
@@ -772,9 +497,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_2DL3_notL2tail.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   ## 2DL3 alignment
@@ -786,9 +511,9 @@ KIR_2DL23 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL3.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   ## 2DL3 VCF generation
@@ -903,9 +628,9 @@ KIR_2DL4 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL4in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -917,9 +642,9 @@ KIR_2DL4 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL4.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.187"
@@ -930,9 +655,9 @@ KIR_2DL4 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL4.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -1025,9 +750,9 @@ KIR_2DL5 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DL5in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1039,9 +764,9 @@ KIR_2DL5 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DL5.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.187"
@@ -1054,9 +779,9 @@ KIR_2DL5 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DL5.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -1149,9 +874,9 @@ KIR_2DP1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DP1in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1163,9 +888,9 @@ KIR_2DP1 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DP1.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.187"
@@ -1176,9 +901,9 @@ KIR_2DP1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DP1.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -1271,9 +996,9 @@ KIR_2DS3 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DS35in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1285,9 +1010,9 @@ KIR_2DS3 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DS35.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.187"
@@ -1298,9 +1023,9 @@ KIR_2DS3 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DS3.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -1393,9 +1118,9 @@ KIR_2DS4 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DS4in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1407,9 +1132,9 @@ KIR_2DS4 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DS4.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.17"
@@ -1420,9 +1145,9 @@ KIR_2DS4 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DS4.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -1515,9 +1240,9 @@ KIR_2DS35 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_2DS35in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1529,9 +1254,9 @@ KIR_2DS35 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR2DS35.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.5"
@@ -1542,9 +1267,9 @@ KIR_2DS35 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_2DS35.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -1637,9 +1362,9 @@ KIR_3DL1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_3DL12in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1651,16 +1376,16 @@ KIR_3DL1 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR3DL1S1.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   
   ## 3DL1
   bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,0,-0.187"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DL1longii"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -1671,9 +1396,9 @@ KIR_3DL1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_3DL1.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   
@@ -1776,9 +1501,9 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_3DL12in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -1790,16 +1515,16 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR3DL1S1.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   
   ## 3DL1het
-  bt2_local <- "--local"
+  #bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,0,-0.187"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DL1longCAT"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -1810,9 +1535,9 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_3DL1het.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   
@@ -1826,15 +1551,15 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ", sequence, "_KIR3DS1.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   
-  bt2_local <- "--local"
+  #bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,0,-0.187"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DS1longCAT"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -1845,9 +1570,9 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_3DS1.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   
@@ -2008,9 +1733,9 @@ KIR_3DS1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_3DL12in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -2022,9 +1747,9 @@ KIR_3DS1 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR3DL1S1.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   
@@ -2038,15 +1763,15 @@ KIR_3DS1 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ", sequence, "_KIR3DS1.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   
-  bt2_local <- "--local"
+  #bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,0,-0.187"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DS1longCAT"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -2057,9 +1782,9 @@ KIR_3DS1 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_3DS1.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_local, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_N, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_no_u, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   
@@ -2164,9 +1889,9 @@ KIR_3DL2 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_3DL2in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -2178,9 +1903,9 @@ KIR_3DL2 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR3DL2.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.187"
@@ -2191,9 +1916,9 @@ KIR_3DL2 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_3DL2.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"
@@ -2286,9 +2011,9 @@ KIR_3DL3 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ","r",sequence, "_3DL3in.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2",bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam)
   cat("\n", bowtie2_var, "\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_al_conc, bt2_sam))
   cat("\n")
   
   bt2_5 <- "-5 3"
@@ -2300,9 +2025,9 @@ KIR_3DL3 <- function(sequence, is_gz) {
   bt2_un_conc <- paste0("--un-conc ",sequence,"_KIR3DL3.fastq")
   bt2_sam <- paste0("-S ", sequence, ".temp")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_un_conc, bt2_sam))
   cat("\n")
   
   bt2_score_min <- "--score-min L,0,-0.35"
@@ -2313,9 +2038,9 @@ KIR_3DL3 <- function(sequence, is_gz) {
   bt2_al_conc <- paste0("--al-conc ", sequence, "_3DL3.fastq")
   bt2_un_conc <- paste0("--un-conc ", sequence, "_notmapped.fastq")
   
-  bowtie2_var <- paste("bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
+  bowtie2_var <- paste("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc)
   cat(bowtie2_var,"\n")
-  system2("bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
+  system2("/home/common_arse/ping_development_projects/test_for_Katie/bowtie/bowtie2-2.3.4.1/bowtie2", c(bt2_fastq, bt2_thread_parameter, bt2_5, bt2_3, bt2_L, bt2_i, bt2_score_min, bt2_I, bt2_X, bt2_index, bt2_sequence_1, bt2_sequence_2, bt2_sam, bt2_al_conc, bt2_un_conc))
   cat("\n")
   
   st_b <- "-b"

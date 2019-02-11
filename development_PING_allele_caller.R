@@ -25,7 +25,7 @@ ping_allele_caller_dev <- function(
   ping.gc.output = "Combined_results.csv",
   results.directory = "",
   resource_location = 'Resources/caller_resources/',
-  allele_resources  = '/home/common_arse/ping_development_projects/testing_dev_ping/Formatted_caller_resources/',
+  allele_resources  = 'Resources/caller_resources/Formatted_caller_resources/',
   DPthresh          = 6
 ){
   
@@ -76,6 +76,7 @@ ping_allele_caller_dev <- function(
   # Create results subfolders
   dir.create(results.directory, showWarnings = F)
   dir.create(paste0(results.directory, "Vcf"), showWarnings = F)
+  dir.create(paste0(results.directory, "Vcf_Genomic"), showWarnings = F)
   dir.create(paste0(results.directory, "KIRcaller"), showWarnings = F)
   dir.create(paste0(results.directory, "Fastq"), showWarnings = F)
   cat("Results directories created.\n\n")

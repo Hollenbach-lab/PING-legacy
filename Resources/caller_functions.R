@@ -261,7 +261,10 @@ master.creator <- function(sequence_list, gc_results){
 # VCF creation (single sample)
 ping.locus <- function(sample, current.locus, is_gz) {
   
-  if("2DL1" == current.locus)  {KIR_2DL1(sample, is_gz)}
+  if("2DL1" == current.locus)  {
+    KIR_2DL1(sample, is_gz)
+    KIR_2DL1_Genomic(sample, is_gz)
+  }
   
   if("2DL23" == current.locus) {KIR_2DL23(sample, is_gz)}
   
@@ -1225,12 +1228,15 @@ get_typing.vcf <- function(x, current.locus,DPthresh = 6){
 
 # Remove Problematic SNP positions that are a product of contamination from a different locus
 #  - Verified through sanger sequencing experiments
-filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.20){
+filter_contam_snps <- function(x,current.locus,KIR_sample_snps, vcf.location.gen,PctFilter2DL1=0.20){
   # 2DL1 Condition
   if (current.locus == "2DL1"){
+    # Read in Genomic Vcf file
+    vcf.genomic.df <- read.table(paste(c(vcf.location.gen,sample,"_2DL1nuc.vcf"),collapse = ""),header = F) 
+    
     # 14933 & 15179 is 2DL2 contamination that arises because of 2DL2 reads aligning to 2DL1*005 (allele that is not real), Pauls bowtie reference has 005
     #   - These two positions were validated by Danillo after resequencing several individuals
-    contam_snp_pos <- x[x$V2 %in% c("4788","4950","4991","5009","5011","14933","15179"),]
+    contam_snp_pos <- x[x$V2 %in% c("4788","4822","4950","4991","5009","5011","6614","14933","15179"),]
     
     # Set up data frame to assess the presence of a block of 2DS1 contamination 
     #block_contam_snp_pos <- x[x$V2 %in% c("6614","6733","6759","6760","6786","6818","10072","14418"),]
@@ -1261,11 +1267,12 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.
     # 1. Except when: 4991=C or 5011=T, in those cases do not remove position 5009
     # 2. Position 4788: if this position is present with a 'G', 
     #                   then substract the read depth of 5009 from 4788, and remove the 'G' call from pos 4788
-    #                   if depth(5009) > depth(4789), then make depth(4789) = 0
+    #                   if depth(5009) > depth(4788), then make depth(4788) = 0
     
     alt_call_4950 <- contam_snp_pos[contam_snp_pos$V2 == "4950",5]
     alt_call_4991 <- contam_snp_pos[contam_snp_pos$V2 == "4991",5]
     alt_call_5011 <- contam_snp_pos[contam_snp_pos$V2 == "5011",5]
+    alt_call_6614 <- contam_snp_pos[contam_snp_pos$V2 == "6614",5]
     presence_2DS1 <- FALSE
     if (alt_call_4950 == "A" | alt_call_4950 == "G"){presence_2DS1 <- TRUE}
     
@@ -1285,7 +1292,7 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.
     }
     
     # Additional condition
-    # - Remove contamination from position 4788 (G)
+    # - Remove contamination from position 4788 (G) and 4822 (A)
     dp4_4950 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "4950",8])
     dp4_4950 <- unlist(strsplit(dp4_4950, "DP4="))[2]
     dp4_4950 <- unlist(strsplit(dp4_4950, ";"))[1]
@@ -1293,8 +1300,10 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.
     dp4_4950_ref <- dp4_4950[1] + dp4_4950[2]
     dp4_4950_alt <- dp4_4950[3] + dp4_4950[4]
     
+    # 4788
     ref_call_4788 <- contam_snp_pos[contam_snp_pos$V2 == "4788",4]
     alt_call_4788 <- contam_snp_pos[contam_snp_pos$V2 == "4788",5]
+    if (alt_call_4788 == "."){alt_call_4788 <- ref_call_4788}
     dp4_4788 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "4788",8])
     dp4_4788 <- unlist(strsplit(dp4_4788, "DP4="))[2]
     dp4_4788 <- unlist(strsplit(dp4_4788, ";"))[1]
@@ -1302,13 +1311,42 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.
     dp4_4788_ref <- dp4_4788[1] + dp4_4788[2]
     dp4_4788_alt <- dp4_4788[3] + dp4_4788[4]
 
+    # 4822
+    ref_call_4822 <- contam_snp_pos[contam_snp_pos$V2 == "4822",4]
+    alt_call_4822 <- contam_snp_pos[contam_snp_pos$V2 == "4822",5]
+    dp4_4822 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "4822",8])
+    dp4_4822 <- unlist(strsplit(dp4_4822, "DP4="))[2]
+    dp4_4822 <- unlist(strsplit(dp4_4822, ";"))[1]
+    dp4_4822 <- as.integer(unlist(strsplit(dp4_4822,",")))
+    dp4_4822_ref <- dp4_4822[1] + dp4_4822[2]
+    dp4_4822_alt <- dp4_4822[3] + dp4_4822[4]
+    
     dp4_5009 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "5009",8])
     dp4_5009 <- unlist(strsplit(dp4_5009, "DP4="))[2]
     dp4_5009 <- unlist(strsplit(dp4_5009, ";"))[1]
     dp4_5009 <- as.integer(unlist(strsplit(dp4_5009,",")))
     dp4_5009_ref <- dp4_5009[1] + dp4_5009[2]
     
-    # Remove contamination "G" from position 4788
+    # depth values needed to resolve position 6614
+    ref_call_6614 <- contam_snp_pos[contam_snp_pos$V2 == "6614",4]
+    alt_call_6614 <- contam_snp_pos[contam_snp_pos$V2 == "6614",5]
+    dp4_6614 <- as.character(contam_snp_pos[contam_snp_pos$V2 == "6614",8])
+    dp4_6614 <- unlist(strsplit(dp4_6614, "DP4="))[2]
+    dp4_6614 <- unlist(strsplit(dp4_6614, ";"))[1]
+    dp4_6614 <- as.integer(unlist(strsplit(dp4_6614,",")))
+    dp4_6614_ref <- dp4_6614[1] + dp4_6614[2]
+    dp4_6614_alt <- dp4_6614[3] + dp4_6614[4]
+    # Intronic position 6497
+    ref_call_6497 <- vcf.genomic.df[vcf.genomic.df$V2 == "6497",4]
+    alt_call_6497 <- vcf.genomic.df[vcf.genomic.df$V2 == "6497",5]
+    dp4_6497 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == "6497",8])
+    dp4_6497 <- unlist(strsplit(dp4_6497, "DP4="))[2]
+    dp4_6497 <- unlist(strsplit(dp4_6497, ";"))[1]
+    dp4_6497 <- as.integer(unlist(strsplit(dp4_6497,",")))
+    dp4_6497_ref <- dp4_6497[1] + dp4_6497[2]
+    dp4_6497_alt <- dp4_6497[3] + dp4_6497[4]
+    
+    # Remove contamination "G" from position 4788,4822
     # subtracted DP4 of 4950 alt call (A or G) from 4788 alt call (C) 
     # If less that 20% of DP4 remains for 4788 alt call after subtraction, force reference call
     ## FIX THIS CONDITION based on the above statements: (Ask Danillo, removing contam G should involve substracting from ref call not alt call?)
@@ -1321,11 +1359,8 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.
         diff_4950_vs_4788 <- dp4_4788_ref - dp4_4950_alt
       }
       
-      force_ref_call <- FALSE
-      if (diff_4950_vs_4788 < dp4_thresh_4788){force_ref_call <- TRUE}
-      
-      # Force reference call for 4788 if status = TRUE
-      if (force_ref_call){
+      # Force reference call for 4788 - 4950 dp4 is less the the theshold (for old PING the reference is wrong compared to IPD-KIR at this position, use alt call)
+      if (diff_4950_vs_4788 < dp4_thresh_4788){
         entry_4788 <- KIR_sample_snps[KIR_sample_snps$position == "4788",]
         entry_4788$snp1call <- entry_4788$var
         entry_4788$snp2call <- entry_4788$var
@@ -1334,6 +1369,48 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, PctFilter2DL1=0.
       }
       
     }
+    
+    ## Remove contaminating alternate call from position 4822 if 2DS1 reads are present 
+    if (presence_2DS1 && alt_call_4822 == "A"){
+      dp4_thresh_4822 <- PctFilter2DL1 * dp4_4822_alt
+      diff_4950_vs_4822 <- 0
+      if (dp4_4950_alt >= dp4_4822_alt){
+        diff_4950_vs_4822 <- 0
+      }else {
+        diff_4950_vs_4822 <- dp4_4822_alt - dp4_4950_alt
+      }
+      
+      # Force reference call for 4822 if the difference between the DP4 of 4950 and 4822 small
+      if (diff_4950_vs_4822 < dp4_thresh_4822){
+        entry_4822 <- KIR_sample_snps[KIR_sample_snps$position == "4822",]
+        entry_4822$snp1call <- entry_4822$ref
+        entry_4822$snp2call <- entry_4822$ref
+        
+        KIR_sample_snps[KIR_sample_snps$position == "4822",] <- entry_4822
+      }
+      
+    }
+    
+    ## Remove contaminating alternate call for position 6614 if based on subtraction from intronic position 6497 indicative of 2DS1 contamination
+    if (presence_2DS1 && alt_call_6614 == "C"){
+      dp4_thresh_6614 <- PctFilter2DL1 * dp4_6614_alt
+      diff_6497_vs_6614 <- 0
+      if (dp4_6497_alt >= dp4_6614_alt){
+        diff_6497_vs_6614 <- 0
+      }else {
+        diff_6497_vs_6614 <- dp4_6614_alt - dp4_6497_alt
+      }
+      
+      # FORCE REFERENCE: if call for 6614 if the difference between the DP4 of intronic position 6497 and 6614 is small
+      if (diff_6497_vs_6614 < dp4_thresh_6614){
+        entry_6614 <- KIR_sample_snps[KIR_sample_snps$position == "6614",]
+        entry_6614$snp1call <- entry_6614$ref
+        entry_6614$snp2call <- entry_6614$ref
+        
+        KIR_sample_snps[KIR_sample_snps$position == "6614",] <- entry_6614
+      }
+    }
+    
     
     ## Handling Block of contaminated SNP positions introduced by 2DS1
     # Block conditions:
@@ -1669,7 +1746,7 @@ haplo.enum <- function(hmat, geno_call, reads_pos) {
 
 ## ALLELE CALLING
 #  - Call genotypes from VCF data frame
-allele_call.vcf <- function(x, sample,DPthresh = 6){
+allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
   
   if(length(x[,1]) == 383 && current.locus == "2DL23"){
     # Generating position information for the current locus
@@ -1685,7 +1762,7 @@ allele_call.vcf <- function(x, sample,DPthresh = 6){
   }
   
   ## Remove SNPs that are a product of contamination from another locus
-  KIR_sample_snps <- filter_contam_snps(x, current.locus, KIR_sample_snps)
+  KIR_sample_snps <- filter_contam_snps(x, current.locus, KIR_sample_snps, vcf.location.gen)
   
   reads_pos <- paste0("X", KIR_sample_snps$position)
   
@@ -2045,7 +2122,8 @@ ping.caller <- function (sample, current.locus, DPthresh = 6) {
   
   # Read in vcf files and check if they are good ----------------------------
   
-  vcf.location <- paste0(results.directory, "Vcf/")
+  vcf.location     <- paste0(results.directory, "Vcf/")
+  vcf.location.gen <- paste(c(results.directory,"Vcf_Genomic/"),collapse = "") 
   
   current_wd <- getwd()
   setwd(vcf.location)
@@ -2111,7 +2189,7 @@ ping.caller <- function (sample, current.locus, DPthresh = 6) {
   
   # Run genotype caller -----------------------------------------------------
   
-  genos.out <- lapply(vcf_list.good, allele_call.vcf, sample, DPthresh)
+  genos.out <- lapply(vcf_list.good, allele_call.vcf, sample, DPthresh, vcf.location.gen)
   
   if(all(unlist(lapply(genos.out, is.null))) || all(unlist(lapply(genos.out, nrow)) == 0)){
     cat("\nNo genotype found, moving on to look for new alleles.\n")
