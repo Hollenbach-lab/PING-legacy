@@ -1225,6 +1225,88 @@ get_typing.vcf <- function(x, current.locus,DPthresh = 6){
   allpos.df
 }
 
+# Create Custom lookup table to remove select alleles
+#  - Collect coding/non-coding positions specific for each target allele
+#  - For 2DL1: 2DL1*010, 2DL1*01201
+custom_2DL1_allele_filter <- function(current.locus,sample,vcf.location.gen, poss_genos_annot){
+  null_allele <- "KIR2DL1_null"
+  
+  ## 1. get target allele defining positions from Genomic Vcf file
+  # Conversion (IPD-KIR to Vcf)
+  # 2DL1*010:       2469=3735,2497=3763
+  # 2DL1*01201:     1311=2577
+  # 2DL1*01201/010: 1321=2587
+  unique_pos_2DL1_010   <- c(3735,3763) # SNPs specific to 2DL1*010
+  unique_pos_2DL1_01201 <- c(2577)      # SNP specific to 2DL1*01201
+  unique_pos_both       <- c(2587)      # SNP specfic to both 2DL1*010 and 2DL1*01201
+  target_pos_vec        <- c(unique_pos_2DL1_010,unique_pos_2DL1_01201, unique_pos_both)
+  vcf.genomic.df <- read.table(paste(c(vcf.location.gen,sample,"_2DL1nuc.vcf"),collapse = ""),header = F)
+  vcf.genomic.df_subset <- vcf.genomic.df[vcf.genomic.df$V2 %in% target_pos_vec,]
+  
+  ## 2. determine status of 2DL1*010 and 2DL1*01201
+  status_010   <- FALSE
+  status_01201 <- FALSE
+  # Target SNPs of interest
+  allele_filter_pos_frame <- read.table("Resources/caller_resources/allele_filter_2DL1.genomic.csv",sep = ",",header = T,stringsAsFactors = F,row.names = 1)
+  snps_2DL1_00101 <- paste(allele_filter_pos_frame["KIR2DL1_00101",], collapse = "")
+  # Reference calls from Genomic Vcf
+  subset_ref_calls <- vcf.genomic.df_subset$V4
+  subset_ref_calls_str <- paste(subset_ref_calls,collapse = "")
+  
+  
+  subset_alt_calls <- c()
+  alt_calls_bool <- is_nuc(vcf.genomic.df_subset$V5)
+  if (all(alt_calls_bool) == FALSE && snps_2DL1_00101 == subset_ref_calls_str){
+    subset_alt_calls <- NULL
+    status_010   <- FALSE
+    status_01201 <- FALSE
+  }else{
+    subset_alt_calls <- vcf.genomic.df_subset$V5
+    names(subset_alt_calls) <- vcf.genomic.df_subset$V2
+    
+    # positive filter
+    if (allele_filter_pos_frame["KIR2DL1_010","X3735"] == as.character(subset_alt_calls["3735"]) &&
+       allele_filter_pos_frame["KIR2DL1_010","X3763"] == as.character(subset_alt_calls["3763"])){
+      status_010 <- TRUE
+    }
+    if (allele_filter_pos_frame["KIR2DL1_01201", "X2577"] == as.character(subset_alt_calls["2577"])){
+      status_01201 <- TRUE
+    } 
+    # negative filter
+    if (as.character(subset_alt_calls["2587"]) != "T"){
+      status_010   <- FALSE
+      status_01201 <- FALSE
+    }
+  }
+  
+  ## 3. Based on status keep or remove 2DL1 alleles from genotype dataframe
+  for(r in 1:nrow(poss_genos_annot)){
+    for (c in 1:ncol(poss_genos_annot)){
+      allele_str <- poss_genos_annot[r,c]
+      allele_str_formatted <- c()
+      if (grepl('/',allele_str)){
+        allele_vec <- unlist(strsplit(allele_str,'/'))
+        if(!status_010)  {allele_vec <- gsub("KIR2DL1_010", "", allele_vec)}
+        if(!status_01201){allele_vec <- gsub("KIR2DL1_01201", "", allele_vec)}
+        
+        for(a in allele_vec){
+          if (a == ""){next}
+          allele_str_formatted <- c(allele_str_formatted,a)
+        }
+        allele_str <- paste(allele_str_formatted,collapse = '/')
+        if(nchar(allele_str) == 0){allele_str <- null_allele}
+        poss_genos_annot[r,c] <- allele_str
+      }else{
+        if(!status_010)  {allele_vec <- gsub("KIR2DL1_010", "", allele_str)}
+        if(!status_01201){allele_vec <- gsub("KIR2DL1_01201", "", allele_str)}
+        if(nchar(allele_str) == 0){allele_str <- null_allele}
+        poss_genos_annot[r,c] <- allele_str
+      }
+    }
+  }
+  
+  return(poss_genos_annot)
+}
 
 # Remove Problematic SNP positions that are a product of contamination from a different locus
 #  - Verified through sanger sequencing experiments
@@ -1240,7 +1322,7 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, vcf.location.gen
     
     # Set up data frame to assess the presence of a block of 2DS1 contamination 
     #block_contam_snp_pos <- x[x$V2 %in% c("6614","6733","6759","6760","6786","6818","10072","14418"),]
-    block_pos_list       <- c("6733","6759","6760","6786","6818","10072")
+    block_pos_list       <- c("6733","6759","6760","6786","6818","10072","14418")
     block_contam_snp_pos <- x[x$V2 %in% block_pos_list,]
     
     refR1_vec <- c()
@@ -1903,6 +1985,16 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
         }
       }
     }
+  }else if (current.locus == "2DL1"){
+    # Add function to remove 2DL1*010 and 2DL1*01201
+    # Create and allele removal lookup table based on select intronic positios
+    allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
+    allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")
+    poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors=FALSE)
+    poss_genos <- custom_2DL1_allele_filter(current.locus,sample,vcf.location.gen, poss_genos)
+    poss_genos <- poss_genos[!poss_genos$X1 == "new",]
+    poss_genos <- poss_genos[!poss_genos$X2 == "new",]
+    
   }else{
     ###alle calling
     allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
