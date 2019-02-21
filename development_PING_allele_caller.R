@@ -97,11 +97,12 @@ ping_allele_caller_dev <- function(
   }
   
   # Pull in the GC results (original PING function)
-  gc_results <- gc.results()
+  #gc_results <- gc.results()
   
   ## Read in Custom GC table for all samples
-  #gc_results <- read.csv(ping.gc.output,header = TRUE, row.names = 1, check.names = F)
-  #gc_results <- as.data.frame(t(gc_results))
+  gc_results <- read.csv(ping.gc.output,header = TRUE, row.names = 1, check.names = F)
+  gc_results <- as.data.frame(t(gc_results))
+  row.names(gc_results) <- tstrsplit(row.names(gc_results),"KIR")[[2]]
   
   # The master list is the intersection of sample name matches in sequence_list and gc_results
   master_list <- master.creator(sequence_list, gc_results)
