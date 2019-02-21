@@ -13,6 +13,7 @@ ping_haplo <- function(
   bowtie.threads  = 36,
   results.directory = '/home/common_arse/INDIGO/3_PING_output/ping_haplo_3DL1S1_new_alleles_rerun_leftovers',
   combined.csv.file = '/home/common_arse/ping_development_projects/GC_table_all_batches.csv',
+  raw.kff.counts    = '',
   DPthresh = 6
 ){
   ipdkir_allele_df <- get_ipdkir_allele_df(kir_gen_path)
@@ -24,18 +25,21 @@ ping_haplo <- function(
   master_haplo_path <- normalizePath(file.path(haplo_resources_directory, 'master_haplo_iteration_testing_v4.csv'), mustWork=T)
   
   ## Making sure we got the right output from ping_kff
-  kff_results_path = normalizePath(file.path(results.directory, 'raw_kff_counts.csv'), mustWork=T)
+  #kff_results_path = normalizePath(file.path(results.directory, 'raw_kff_counts.csv'), mustWork=T)
+  kff_results_path = normalizePath(raw.kff.counts,mustWork = T)
   
   cat('\nCreating gc_input.csv\n')
   ## figuring out 2DL2/3 copy number, creates gc_input.csv file
-  prepare_gc_input(kff_results_path,combined.csv.file,results.directory)
+  #prepare_gc_input(kff_results_path,combined.csv.file,results.directory)
   
   ## Looking for the prepare_gc_input output file
-  gc_input_path = normalizePath(file.path(results.directory,'gc_input.csv'), mustWork=T)
+  #gc_input_path = normalizePath(file.path(results.directory,'gc_input.csv'), mustWork=T)
+  gc_input_path <- normalizePath(combined.csv.file, mustWork = T)
   
   cat('\nReading in gc_input.csv\n')
   ## Read in thegc_input.csv file
   master_gc_table <- read_master_gc(gc_input_path)
+  colnames(master_gc_table) <- tstrsplit(colnames(master_gc_table),"KIR")[[2]]
   
   cat('\nReading in allele references\n')
   ## Reading in the reference allele name table
