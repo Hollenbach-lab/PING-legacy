@@ -1297,8 +1297,8 @@ custom_2DL1_allele_filter <- function(current.locus,sample,vcf.location.gen, pos
         if(nchar(allele_str) == 0){allele_str <- null_allele}
         poss_genos_annot[r,c] <- allele_str
       }else{
-        if(!status_010)  {allele_vec <- gsub("KIR2DL1_010", "", allele_str)}
-        if(!status_01201){allele_vec <- gsub("KIR2DL1_01201", "", allele_str)}
+        if(!status_010)  {allele_str <- gsub("KIR2DL1_010", "", allele_str)}
+        if(!status_01201){allele_str <- gsub("KIR2DL1_01201", "", allele_str)}
         if(nchar(allele_str) == 0){allele_str <- null_allele}
         poss_genos_annot[r,c] <- allele_str
       }
@@ -1991,6 +1991,8 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
     allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
     allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")
     poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors=FALSE)
+    
+    # Filter out 2DL1 alleles based on select Genomic Positions
     poss_genos <- custom_2DL1_allele_filter(current.locus,sample,vcf.location.gen, poss_genos)
     poss_genos <- poss_genos[!poss_genos$X1 == "new",]
     poss_genos <- poss_genos[!poss_genos$X2 == "new",]
