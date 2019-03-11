@@ -497,6 +497,9 @@ KIR_2DL1_Genomic <- function(sequence, is_gz) {
     }
   }
   
+  # Filter out contaminating reads from SAM file
+  filter_contam_reads_from_sam_file(paste0(sequence,"_2DL1.sam"), sequence)
+  
   st_b <- "-b"
   st_q <- "-q10"
   st_in <- paste0(sequence,"_2DL1.sam")
@@ -543,6 +546,7 @@ KIR_2DL1_Genomic <- function(sequence, is_gz) {
   #file.copy(paste0(sequence, "_2DL1.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL1.2.fastq"))
   
   file.copy(paste0(sequence, "_2DL1nuc.vcf"), paste0(results.directory, "Vcf_Genomic/", sequence, "_2DL1nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL1.sam"), paste0(results.directory, "Sam_Genomic/", sequence, "_2DL1.sam"))
   
   file.remove(paste0(sequence, "_2DL1nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DL1S1in.1.fastq"))
