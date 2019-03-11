@@ -77,6 +77,7 @@ ping_allele_caller_dev <- function(
   dir.create(results.directory, showWarnings = F)
   dir.create(paste0(results.directory, "Vcf"), showWarnings = F)
   dir.create(paste0(results.directory, "Vcf_Genomic"), showWarnings = F)
+  dir.create(paste0(results.directory, "Sam_Genomic"), showWarnings = F)
   dir.create(paste0(results.directory, "KIRcaller"), showWarnings = F)
   dir.create(paste0(results.directory, "Fastq"), showWarnings = F)
   cat("Results directories created.\n\n")
