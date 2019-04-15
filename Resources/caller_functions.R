@@ -1474,25 +1474,29 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, vcf.location.gen
     }
     
     ## Remove contaminating alternate call for position 6614 if based on subtraction from intronic position 6497 indicative of 2DS1 contamination
+    ## - Condition works: temporarily silence this condition to see if concordance is improved
+    #if (presence_2DS1 && alt_call_6614 == "C"){
+    #  dp4_thresh_6614 <- PctFilter2DL1 * dp4_6614_alt
+    #  diff_6497_vs_6614 <- 0
+    #  if (dp4_6497_alt >= dp4_6614_alt){
+    #    diff_6497_vs_6614 <- 0
+    #  }else {
+    #    diff_6497_vs_6614 <- dp4_6614_alt - dp4_6497_alt
+    #  }
+    #  
+    #  # FORCE REFERENCE: if call for 6614 if the difference between the DP4 of intronic position 6497 and 6614 is small
+    #  if (diff_6497_vs_6614 < dp4_thresh_6614){
+    #    entry_6614 <- KIR_sample_snps[KIR_sample_snps$position == "6614",]
+    #    entry_6614$snp1call <- entry_6614$ref
+    #    entry_6614$snp2call <- entry_6614$ref
+    #    
+    #    KIR_sample_snps[KIR_sample_snps$position == "6614",] <- entry_6614
+    #  }
+    #}
+    #### New condition: if position 2DS1 is present and 6614 is heterozygous, remove this position from consideration in calling (not reliable)
     if (presence_2DS1 && alt_call_6614 == "C"){
-      dp4_thresh_6614 <- PctFilter2DL1 * dp4_6614_alt
-      diff_6497_vs_6614 <- 0
-      if (dp4_6497_alt >= dp4_6614_alt){
-        diff_6497_vs_6614 <- 0
-      }else {
-        diff_6497_vs_6614 <- dp4_6614_alt - dp4_6497_alt
-      }
-      
-      # FORCE REFERENCE: if call for 6614 if the difference between the DP4 of intronic position 6497 and 6614 is small
-      if (diff_6497_vs_6614 < dp4_thresh_6614){
-        entry_6614 <- KIR_sample_snps[KIR_sample_snps$position == "6614",]
-        entry_6614$snp1call <- entry_6614$ref
-        entry_6614$snp2call <- entry_6614$ref
-        
-        KIR_sample_snps[KIR_sample_snps$position == "6614",] <- entry_6614
-      }
+      KIR_sample_snps <- KIR_sample_snps[!KIR_sample_snps$position %in% c("6614"),]
     }
-    
     
     ## Handling Block of contaminated SNP positions introduced by 2DS1
     # Block conditions:
@@ -1560,7 +1564,8 @@ filter_contam_reads_from_sam_file <- function(sam_file, sequence){
   probe7 <- "CACGGTCGTCAGCGTGGC"
   
   # Create data table of SAM file
-  sam.df <- read.table(sam_file, skip = 3, col.names = 1:20,header = F, check.names=F, fill=T,sep = "\t", stringsAsFactors = F)
+  #sam.df <- read.table(sam_file, skip = 3, col.names = 1:20,header = F, check.names=F, fill=T,sep = "\t", stringsAsFactors = F)
+  sam.df <- read.table(sam_file, skip = 3,header = F, check.names=F, fill=T,sep = "\t", stringsAsFactors = F)
   
   output.samTable <- as.data.table(sam.df)
   colnames(output.samTable)[1]  <- 'read_name'
