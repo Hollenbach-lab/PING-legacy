@@ -1605,6 +1605,30 @@ filter_contam_reads_from_sam_file <- function(sam_file, sequence){
 }
 
 
+# This function will customly add in VCF info for select positions that are otherwise not considered for calling within the CDS Vcf files
+add_more_snp_positions <- function(vcf.df,current.locus,KIR_sample_snps, vcf.location.gen, SOS_locus_lookup,DPthresh){
+  if (current.locus == "2DS4"){
+    vcf.genomic.df     <- read.table(paste(c(vcf.location.gen,sample,"_2DS4nuc.vcf"),collapse = ""),header = F)
+    allele_calling_pos <- paste0("X", KIR_sample_snps$position)
+    variable_pos       <- names(SOS_locus_lookup)
+    variable_pos       <- variable_pos[! variable_pos %in% c("allele")]
+    missing_pos        <- variable_pos[! variable_pos %in% allele_calling_pos]
+    missing_pos        <- tstrsplit(missing_pos,"X")[[2]]
+    vcf.df.missing     <- vcf.genomic.df[vcf.genomic.df$V2 %in% missing_pos,]
+    
+    vcf.combined <- rbind(vcf.df,vcf.df.missing)
+    vcf.combined <- vcf.combined[order(vcf.combined$V1,vcf.combined$V2),]
+    
+    # Re-enter the modified Vcf data frame into the QC function
+    KIR_sample_snps <- emformat.vcf(vcf.combined,DPthresh)
+    
+  }
+  
+  return(KIR_sample_snps)
+}
+
+
+
 ##==================================================================
 ## PING Allele Caller Functions ------------------------------------
 ##==================================================================
@@ -1899,6 +1923,8 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
     return(NULL)
   }
   
+  # Add in any relevant positions not captured during the generation of the CDS Vcf file
+  KIR_sample_snps <- add_more_snp_positions(x,current.locus,KIR_sample_snps, vcf.location.gen, SOS_locus_lookup,DPthresh)
   ## Remove SNPs that are a product of contamination from another locus
   KIR_sample_snps <- filter_contam_snps(x, current.locus, KIR_sample_snps, vcf.location.gen)
   

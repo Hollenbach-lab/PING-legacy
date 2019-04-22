@@ -1463,17 +1463,11 @@ KIR_2DS4 <- function(sequence, is_gz) {
   bcf_O <- "-O v"
   bcf_out <- paste0("-o ", sequence, "_2DS4nuc.vcf")
   
-  #st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_l,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
+  ### CDS VCF
+  st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_l,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
   cat(st_mpileup_bcf_call,"\n")
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
   cat("\n")
-  
-  # Genomic VCF
-  #st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
-  #cat(st_mpileup_bcf_call,"\n")
-  #system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
-  #cat("\n")
-  
   
   system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS4cons.fastq")))
   
@@ -1481,7 +1475,17 @@ KIR_2DS4 <- function(sequence, is_gz) {
   #file.copy(paste0(sequence, "_2DS4.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DS4.2.fastq"))
   
   file.copy(paste0(sequence, "_2DS4nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DS4nuc.vcf"))
-  #file.copy(paste0(sequence, "_2DS4.sam"), paste0(results.directory,"/", sequence, "_2DS4.sam"))
+  
+  ### Genomic VCF
+  st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
+  cat(st_mpileup_bcf_call,"\n")
+  system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
+  cat("\n")
+  
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS4cons.fastq")))
+  
+  file.copy(paste0(sequence, "_2DS4nuc.vcf"), paste0(results.directory, "Vcf_Genomic/", sequence, "_2DS4nuc.vcf"))
+  #file.copy(paste0(sequence, "_2DS4.sam"), paste0(results.directory,"Sam_Genomic/", sequence, "_2DS4.sam"))
   
   file.remove(paste0(sequence, "_2DS4nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DS4in.1.fastq"))
