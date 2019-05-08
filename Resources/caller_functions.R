@@ -1308,9 +1308,24 @@ custom_2DL1_allele_filter <- function(current.locus,sample,vcf.location.gen, pos
   return(poss_genos_annot)
 }
 
+# Parse out the DP4 of the reference and alternate call for a given Vcf position
+get_DP4_select_snp <- function(pos, vcf.df){
+  dp4 <- as.character(vcf.df[vcf.df$V2 == pos,8])
+  dp4 <- unlist(strsplit(dp4, "DP4="))[2]
+  dp4 <- unlist(strsplit(dp4, ";"))[1]
+  dp4 <- as.integer(unlist(strsplit(dp4,",")))
+  dp4_ref <- dp4[1] + dp4[2]
+  dp4_alt <- dp4[3] + dp4[4]
+  
+  dp4_vec <- c(dp4_ref,dp4_alt)
+  
+  return(dp4_vec)
+}
+
+
 # Remove Problematic SNP positions that are a product of contamination from a different locus
 #  - Verified through sanger sequencing experiments
-filter_contam_snps <- function(x,current.locus,KIR_sample_snps, vcf.location.gen,PctFilter2DL1=0.20){
+filter_contam_snps <- function(x,current.locus,KIR_sample_snps, vcf.location.gen,PctFilter2DL1=0.20, PctFilter2DL5=0.20){
   # 2DL1 Condition
   if (current.locus == "2DL1"){
     # Read in Genomic Vcf file
@@ -1540,6 +1555,61 @@ filter_contam_snps <- function(x,current.locus,KIR_sample_snps, vcf.location.gen
     
   }
   
+  # 2DL5: filter all Exon 1 variable positions. In general 2DL5 suffers from 3DP1 contamination. 
+  #       Exon 1 has strong sequence similarity across many of the KIR loci, so PING filters out a lot of reads
+  #       in this particular exon region. The low depth makes pos 283 unreliable
+  if (current.locus == "2DL5"){
+    # Read in Genomic Vcf file
+    vcf.genomic.df <- read.table(paste(c(vcf.location.gen,sample,"_2DL5nuc.vcf"),collapse = ""),header = F) 
+    
+    # Contaminated positions (PING Vcf):
+    # - 283 -> contamination from most KIR loci, this why it is being omitted from calling
+    # - 1081 -> contamination from multiple loci, in paritcular we can tag the 2DS2 and 2DP1 contamination
+    contam_snps_to_omit <- c("283")
+    KIR_sample_snps <- KIR_sample_snps[! KIR_sample_snps$position %in% contam_snps_to_omit,]
+    
+    # Handle contamination at position 1081
+    # - dp4_vec[1] = Ref DP4, dp4_vec[2] = Alt DP4
+    dp4_1081_vec <- get_DP4_select_snp(pos = "1081", vcf.df = vcf.genomic.df)
+    dp4_1112_vec <- get_DP4_select_snp(pos = "1112", vcf.df = vcf.genomic.df)
+    dp4_1115_vec <- get_DP4_select_snp(pos = "1115", vcf.df = vcf.genomic.df)
+    
+    # Get base calls for positions of interest and their tags
+    alt_1081 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == "1081",5])
+    alt_1112 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == "1112",5])
+    alt_1115 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == "1115",5])
+    
+    if (alt_1081 == "C" && dp4_1081_vec[2] > 0){
+      total_contam_dp <- 0
+      
+      alt_dp4_1081 <- as.numeric(dp4_1081_vec[2])
+      alt_dp4_1112 <- as.numeric(dp4_1112_vec[2])
+      alt_dp4_1115 <- as.numeric(dp4_1115_vec[2])
+      
+      if (alt_1112 == "A"){total_contam_dp <- total_contam_dp + alt_dp4_1112}
+      if (alt_1115 == "T"){total_contam_dp <- total_contam_dp + alt_dp4_1115}
+      
+      force_ref <- FALSE
+      dp4_thresh_1081 <- PctFilter2DL5 * alt_dp4_1081
+      if (total_contam_dp >= alt_dp4_1081){
+        diff_dp4 <- 0
+        force_ref <- TRUE
+      } else{
+        diff_dp4 <- alt_dp4_1081 - total_contam_dp
+        if (diff_dp4 < dp4_thresh_1081){
+          force_ref <- TRUE
+        }
+      }
+      
+      if (force_ref){
+        entry_1081 <- KIR_sample_snps[KIR_sample_snps$position == "1081",]
+        entry_1081$snp1call <- entry_1081$ref
+        entry_1081$snp2call <- entry_1081$ref
+        KIR_sample_snps[KIR_sample_snps$position == "1081",] <- entry_1081
+      }
+      
+    }
+  }
   
   # 3DL1S1 conditions: Removing 2DS4 contamination
   #if (current.locus == "3DL1"){
@@ -1625,6 +1695,46 @@ add_more_snp_positions <- function(vcf.df,current.locus,KIR_sample_snps, vcf.loc
   }
   
   return(KIR_sample_snps)
+}
+
+# This function filters 2DL5 alleles out of a given allele string right before making the final genotype call
+#  - looks at specific genomic positions to determine the presence/absence of 2DL5A/2DL5B alleles
+filter_2DL5_allele_str <- function(allele_str, sample,vcf.location.gen, DPthresh,PctFilter2DL5=0.20){
+  vcf.genomic.df <- read.table(paste(c(vcf.location.gen,sample,"_2DL5nuc.vcf"),collapse = ""),header = F)
+  
+  presence2DL5A = TRUE
+  presence2DL5B = TRUE
+  
+  ### Extract position 1320
+  #    - differentiates 2DL5A from 2DL5B, specifically 2DL5A*00101 vs. 2DL5B*00801
+  target_pos = "1320"
+  ref_call_1320 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == target_pos,4])
+  alt_call_1320 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == target_pos,5])
+  
+  dp4_1320 <- as.character(vcf.genomic.df[vcf.genomic.df$V2 == target_pos,8])
+  dp4_1320 <- unlist(strsplit(dp4_1320, "DP4="))[2]
+  dp4_1320 <- unlist(strsplit(dp4_1320, ";"))[1]
+  dp4_1320 <- as.integer(unlist(strsplit(dp4_1320,",")))
+  dp4_1320_ref <- dp4_1320[1] + dp4_1320[2]
+  dp4_1320_alt <- dp4_1320[3] + dp4_1320[4]
+  
+  dp4_threshold <- PctFilter2DL5 * dp4_1320_ref
+  if (ref_call_1320 == "G" && alt_call_1320 == "."){
+    if (dp4_1320_alt < dp4_threshold){
+      presence2DL5B <- FALSE
+    }
+  }
+  
+  # filter allele string based on 2DL5A/B presence absence
+  allele_list <- unlist(strsplit(allele_str,"/"))
+  if (presence2DL5B == FALSE && presence2DL5A == TRUE){
+    allele_list <- allele_list[grep("KIR2DL5A",allele_list)]
+  } else if (presence2DL5B == TRUE && presence2DL5A == FALSE){
+    allele_list <- allele_list[grep("KIR2DL5B",allele_list)]
+  }
+  allele_str <- paste(allele_list,collapse = '/')
+  
+  return(allele_str)
 }
 
 
@@ -1923,6 +2033,7 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
     return(NULL)
   }
   
+  
   # Add in any relevant positions not captured during the generation of the CDS Vcf file
   KIR_sample_snps <- add_more_snp_positions(x,current.locus,KIR_sample_snps, vcf.location.gen, SOS_locus_lookup,DPthresh)
   ## Remove SNPs that are a product of contamination from another locus
@@ -2079,7 +2190,20 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
     poss_genos <- poss_genos[!poss_genos$X1 == "new",]
     poss_genos <- poss_genos[!poss_genos$X2 == "new",]
     
-  }else{
+  } else if (current.locus == "2DL5"){
+    allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
+    allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")
+    
+    # Use custom non-coding SNPs to determine presence of 2DL5A and 2DL5B
+    if(grepl("KIR2DL5A_00101", allele1) && grepl("KIR2DL5B_00801", allele1) && allele1 == allele2){
+      allele1 <- filter_2DL5_allele_str(allele1, sample,vcf.location.gen, DPthresh)
+      allele2 <- filter_2DL5_allele_str(allele2, sample,vcf.location.gen, DPthresh)
+    }
+    
+    poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors=FALSE)
+    poss_genos <- poss_genos[!poss_genos$X1 == "new",]
+    poss_genos <- poss_genos[!poss_genos$X2 == "new",]
+  } else{
     ###alle calling
     allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
     allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")

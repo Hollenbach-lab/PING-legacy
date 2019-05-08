@@ -1097,6 +1097,7 @@ KIR_2DL5 <- function(sequence, is_gz) {
   bcf_O <- "-O v"
   bcf_out <- paste0("-o ", sequence, "_2DL5nuc.vcf")
   
+  ### CDS Vcf file
   st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_l,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
   cat(st_mpileup_bcf_call,"\n")
   system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_l, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
@@ -1106,8 +1107,19 @@ KIR_2DL5 <- function(sequence, is_gz) {
   
   #file.copy(paste0(sequence, "_2DL5.1.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.1.fastq"))
   #file.copy(paste0(sequence, "_2DL5.2.fastq"), paste0(results.directory, "Fastq/", sequence, "_2DL5.2.fastq"))
-  
   file.copy(paste0(sequence, "_2DL5nuc.vcf"), paste0(results.directory, "Vcf/", sequence, "_2DL5nuc.vcf"))
+  
+  
+  ### Genomic VCF
+  st_mpileup_bcf_call <- paste("samtools mpileup",st_m,st_F,st_u,st_f,st_in,st_break,bcf_call, bcf_multi_al,bcf_O,bcf_out)
+  cat(st_mpileup_bcf_call,"\n")
+  system2("samtools", c("mpileup", st_m, st_F, st_u, st_f, st_in, st_break, bcf_call, bcf_multi_al, bcf_O, bcf_out))
+  cat("\n")
+  
+  system2("samtools", c("mpileup", st_m, st_f, st_u, st_f, st_in, st_break, bcf_call, "-c", st_break, "vcfutils.pl", "vcf2fq", ">", paste0(results.directory, "Fastq/", sequence, "_2DS4cons.fastq")))
+  
+  file.copy(paste0(sequence, "_2DL5nuc.vcf"), paste0(results.directory, "Vcf_Genomic/", sequence, "_2DL5nuc.vcf"))
+  file.copy(paste0(sequence, "_2DL5.sam"), paste0(results.directory,"Sam_Genomic/", sequence, "_2DL5.sam"))
   
   file.remove(paste0(sequence, "_2DL5nuc.vcf"))
   file.remove(paste0("r",sequence,"_2DL5in.1.fastq"))
