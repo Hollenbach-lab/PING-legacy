@@ -1691,7 +1691,7 @@ KIR_3DL1 <- function(sequence, is_gz) {
   ## 3DL1
   bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,1,0.6"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DL1longii"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -1830,7 +1830,7 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   ## 3DL1het
   bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,1,0.6"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DL1longCAT"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -1865,7 +1865,7 @@ KIR_3DL1S1 <- function(sequence, is_gz) {
   
   bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,1,0.6"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DS1longCAT"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
@@ -2077,7 +2077,7 @@ KIR_3DS1 <- function(sequence, is_gz) {
   
   bt2_local <- "--local"
   bt2_N <- "-N 1"
-  bt2_score_min <- "--score-min L,0,0.6"
+  bt2_score_min <- "--score-min L,1,0.6"
   bt2_index <- "-x Resources/caller_resources/Filters/3DL1/3DS1longCAT"
   bt2_t <- "-t"
   bt2_X <- "-X 750"
