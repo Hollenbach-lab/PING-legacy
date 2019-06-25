@@ -2521,8 +2521,9 @@ ping.caller <- function (sample, current.locus, DPthresh = 6) {
     genos.df$genotype <- paste(genos.df$X1,genos.df$X2,sep="+")
     genos.df$X1 <- NULL
     genos.df$X2 <- NULL
-    genos.df$sample <- row.names(genos.df)
-    genos.df$sample <- sapply(strsplit(genos.df$sample, "_"), "[", 1)
+    genos.df$sample  <- sample
+    #genos.df$sample <- row.names(genos.df)
+    #genos.df$sample <- sapply(strsplit(genos.df$sample, "_"), "[", 1)
     genos.df <- genos.df[,c(2,1)]
     var <- gsub("vcf","1",row.names(genos.df))
     genos.df$var <- sapply(strsplit(var, "nuc."), "[", 2)
