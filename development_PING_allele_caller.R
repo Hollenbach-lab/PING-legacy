@@ -142,7 +142,10 @@ ping_allele_caller_dev <- function(
     loci.list <- rownames(gc_results)[locus_presence != 0]
     
     # Cutting down the loci.list to only include supported loci
+    add_2DL23_to_list <- FALSE
+    if (any(loci.list %in% c("2DL3","2DL2"))){add_2DL23_to_list <- TRUE}
     loci.list <- loci.list[loci.list %in% supported.loci]
+    if (add_2DL23_to_list){loci.list <- c(loci.list,"2DL23")}
     
     # Mutating 2DS5 to 2DS35 for allele calling
     if("2DS5" %in% loci.list){loci.list[loci.list == "2DS5"] <- "2DS35"}
@@ -158,6 +161,9 @@ ping_allele_caller_dev <- function(
       
       # Get sample copy number information for current.locus
       copy_number <- gc_results[pmatch(current.locus, rownames(gc_results)),pmatch(sample, colnames(gc_results))]
+      if (current.locus == "2DL23"){
+        copy_number <- sum(gc_results[pmatch(c("2DL2","2DL3"), rownames(gc_results)),pmatch(sample, colnames(gc_results))])
+      }
       
       if("2DS35" == current.locus){
         current.locus <- "2DS5"
