@@ -292,7 +292,10 @@ ping.locus <- function(sample, current.locus, is_gz) {
     KIR_3DS1(sample, is_gz)
   }
   
-  if("3DL2" == current.locus) {KIR_3DL2(sample, is_gz)}
+  if("3DL2" == current.locus) {
+    KIR_3DL2(sample, is_gz)
+    KIR_3DL2(sample, is_gz,cds=FALSE) # Genomic VCF
+  }
   
   if("3DL3" == current.locus) {KIR_3DL3(sample, is_gz)}
 }
@@ -1737,6 +1740,103 @@ filter_2DL5_allele_str <- function(allele_str, sample,vcf.location.gen, DPthresh
   return(allele_str)
 }
 
+# Filter 3DL2 genotype calls based on the presence/absence of select alleles
+#  - 3DL2*00201 presence: C at poition 193 (1167)
+#  - 3DL1*00103 presence: G at pos 285(1259) 
+#  - 3DL2*010 presence: G at pos 285(1259) and T at pos 1044(2018)
+filter_3DL2_genos <- function(genos.df, sample,vcf.location.gen, DPthresh,PctFilter3DL2=0.20){
+  # Format genos data frame into one string
+  genos_str_temp <- c()
+  for(i in row.names(genos.df)){
+    g <- paste(c(genos.df[i,1],"+",genos.df[i,2]),collapse = "")
+    genos_str_temp <- c(genos_str_temp,g)
+  }
+  genos_str_temp <- paste(genos_str_temp,collapse = ":")
+  
+  # Only use 3DL2 conditions on these specific ambiguities
+  target_ambiguities <- c(
+    "KIR3DL2_00201+KIR3DL2_00701:KIR3DL2_01001+KIR3DL2_015:KIR3DL2_10701+KIR3DL2_00601",
+    "KIR3DL2_00103+KIR3DL2_00701:KIR3DL2_01001+KIR3DL2_00601",
+    "KIR3DL2_00101+KIR3DL2_00201:KIR3DL2_00202+KIR3DL2_00103",
+    "KIR3DL2_00103+KIR3DL2_10701:KIR3DL2_01001+KIR3DL2_00201")
+  
+  ### Execute conditions
+  genos.df.fin <- genos.df
+  if (genos_str_temp %in% target_ambiguities){
+    vcf.genomic.df    <- read.table(paste(c(vcf.location.gen,sample,"_3DL2nuc.vcf"),collapse = ""),header = F)
+    vcf.df.target.pos <- vcf.genomic.df[vcf.genomic.df$V2 %in% c("1167","1259","2018"),]
+    dp_str <- tstrsplit(vcf.df.target.pos$V8,"DP4=")[[2]]
+    dp_str <- tstrsplit(dp_str,";")[[1]]
+    
+    # Extract raw DP 
+    raw_dp_str <- tstrsplit(vcf.df.target.pos$V8,"DP=")[[2]]
+    raw_dp_str <- tstrsplit(raw_dp_str,";")[[1]]
+    vcf.df.target.pos$DP <- raw_dp_str
+    
+    # Extract total depth(DP4) for both the reference and alternate call at these select positions
+    ref_dp4_vec <- c()
+    alt_dp4_vec <- c()
+    thresh_vec  <- c()
+    for (dp4 in dp_str) {
+      all_dp4 = tstrsplit(dp4,",")
+      ref_dp4 <- as.numeric(all_dp4[1]) + as.numeric(all_dp4[2])
+      alt_dp4 <- as.numeric(all_dp4[3]) + as.numeric(all_dp4[4])
+      dp4_thresh <- PctFilter3DL2 * ref_dp4
+      
+      ref_dp4_vec <- c(ref_dp4_vec,ref_dp4)
+      alt_dp4_vec <- c(alt_dp4_vec,alt_dp4)
+      thresh_vec  <- c(thresh_vec,dp4_thresh)
+    }
+    
+    vcf.df.target.pos$refDP4    <- ref_dp4_vec
+    vcf.df.target.pos$altDP4    <- alt_dp4_vec
+    vcf.df.target.pos$threshDP4 <- thresh_vec
+    
+    # Determine the presence/absence of select alleles
+    presence010   <- FALSE
+    presence00201 <- FALSE
+    presence00103 <- FALSE
+    
+    # 3DL2*010 presence/absence
+    entry_285  <- vcf.df.target.pos[vcf.df.target.pos$V2 == "1259",]
+    entry_1044 <- vcf.df.target.pos[vcf.df.target.pos$V2 == "2018",]
+    if (entry_285$V5 == "G" && as.numeric(entry_285$altDP4) > as.numeric(entry_285$threshDP4)){
+      if (as.numeric(entry_285$DP) > DPthresh) {presence00103 <- TRUE}
+      if (entry_1044$V5 == "T" && as.numeric(entry_1044$altDP4) > as.numeric(entry_1044$threshDP4)){
+        if (as.numeric(entry_285$DP) > DPthresh && as.numeric(entry_1044$DP) > DPthresh){
+          presence010 <- TRUE
+        }
+      }
+    }
+    
+    # 3DL2*00201 presence/absence
+    entry_193  <- vcf.df.target.pos[vcf.df.target.pos$V2 == "1167",]
+    if (entry_193$V5 == "C" && as.numeric(entry_193$altDP4) > as.numeric(entry_193$threshDP4)){
+      if (as.numeric(entry_193$DP) > DPthresh){presence00201 <- TRUE}
+    }
+    
+    # remove genotypes ambiuities that contain alleles determined to be absent by this function
+    rows_to_rm <- c()
+    for (i in row.names(genos.df)) {
+      if(any(grepl("3DL2_010",genos.df[i,])) && presence010 == FALSE){
+        rows_to_rm <- c(rows_to_rm,i)
+      }
+      
+      if(any(grepl("3DL2_00201",genos.df[i,])) && presence00201 == FALSE){
+        rows_to_rm <- c(rows_to_rm,i)
+      }
+      
+      if(any(grepl("3DL2_00103",genos.df[i,])) && presence00103 == FALSE){
+        rows_to_rm <- c(rows_to_rm,i)
+      }
+    }
+    
+    genos.df.fin <- genos.df[! row.names(genos.df) %in% rows_to_rm,]
+    if (nrow(genos.df.sub) == 0){genos.df.fin <- genos.df}
+  }
+  
+  return(genos.df.fin)
+}  
 
 
 ##==================================================================
@@ -2186,7 +2286,12 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
     poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors=FALSE)
     
     # Filter out 2DL1 alleles based on select Genomic Positions
+    poss_genos.old <- poss_genos
     poss_genos <- custom_2DL1_allele_filter(current.locus,sample,vcf.location.gen, poss_genos)
+    # If custom filtering fails, keep original call
+    if (poss_genos$X1 == "KIR2DL1_null" && poss_genos$X2 == "KIR2DL1_null"){
+      poss_genos <- poss_genos.old
+    }
     poss_genos <- poss_genos[!poss_genos$X1 == "new",]
     poss_genos <- poss_genos[!poss_genos$X2 == "new",]
     
@@ -2203,6 +2308,16 @@ allele_call.vcf <- function(x, sample,DPthresh = 6, vcf.location.gen){
     poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors=FALSE)
     poss_genos <- poss_genos[!poss_genos$X1 == "new",]
     poss_genos <- poss_genos[!poss_genos$X2 == "new",]
+  } else if (current.locus == "3DL2") {
+    allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
+    allele2 <- ifelse(poss_genos$X2 %in% lookitup$string, (lookitup[match(poss_genos$X2, lookitup$string), 3]),"new")
+    
+    poss_genos <- data.frame(cbind(as.character(allele1),as.character(allele2)), stringsAsFactors=FALSE)
+    poss_genos <- poss_genos[!poss_genos$X1 == "new",]
+    poss_genos <- poss_genos[!poss_genos$X2 == "new",]
+    
+    # Filter poss_genos data frame based on the presence and absence of select 3DL2 alleles
+    poss_genos <- filter_3DL2_genos(poss_genos, sample,vcf.location.gen, DPthresh)
   } else{
     ###alle calling
     allele1 <- ifelse(poss_genos$X1 %in% lookitup$string, (lookitup[match(poss_genos$X1, lookitup$string), 3]),"new")
