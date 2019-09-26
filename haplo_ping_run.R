@@ -3,17 +3,22 @@ library(digest) ## use for md5 hash algorithm
 library(gtools)
 library(data.table)
 library(stringr)
+
+setwd('/home/common_arse/ping_troubleshooting/PING_github/')
+
 source("Resources/caller_functions.R",local = TRUE)
 source('Resources/haplo_functions.R')
+
+
 
 ping_haplo <- function(
   sample.location = '/home/common_arse/temp_indigo_all_missing_leftovers/',
   fastq.pattern.1 = '_1.fastq.gz',
   fastq.pattern.2 = '_2.fastq.gz',
   bowtie.threads  = 36,
-  results.directory = '/home/common_arse/INDIGO/3_PING_output/ping_haplo_3DL1S1_new_alleles_rerun_leftovers',
+  results.directory = '/home/common_arse/ping_troubleshooting/Results/temp_indigo_all_missing_leftovers/',
   combined.csv.file = '/home/common_arse/ping_development_projects/GC_table_all_batches.csv',
-  raw.kff.counts    = '',
+  raw.kff.counts    = '/home/common_arse/INDIGO/3_PING_output/ping_haplo_3DL1S1_new_alleles_rerun_leftovers/raw_kff_counts.csv',
   DPthresh = 6
 ){
   ipdkir_allele_df <- get_ipdkir_allele_df(kir_gen_path)
@@ -39,7 +44,16 @@ ping_haplo <- function(
   cat('\nReading in gc_input.csv\n')
   ## Read in thegc_input.csv file
   master_gc_table <- read_master_gc(gc_input_path)
-  colnames(master_gc_table) <- tstrsplit(colnames(master_gc_table),"KIR")[[2]]
+  
+  ## Remove any 'KIR' from the column names (if present)
+  colNameList <- tstrsplit(colnames(master_gc_table),'KIR')
+  offsetInt <- length(colNameList)
+  
+  ## Reassign the new 'KIR'less column names
+  colnames(master_gc_table) <- colNameList[[offsetInt]]
+
+  ## Old method CAUSED BUG WHEN 'KIR' WAS NOT IN THE COLUMN NAME ORIGINALLY
+  #colnames(master_gc_table) <- tstrsplit(colnames(master_gc_table),"KIR")[[2]]
   
   cat('\nReading in allele references\n')
   ## Reading in the reference allele name table
