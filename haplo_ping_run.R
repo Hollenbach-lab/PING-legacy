@@ -4,7 +4,7 @@ library(gtools)
 library(data.table)
 library(stringr)
 
-setwd('/home/common_arse/ping_troubleshooting/PING_github/')
+#setwd('/home/common_arse/ping_troubleshooting/PING_github/')
 
 source("Resources/caller_functions.R",local = TRUE)
 source('Resources/haplo_functions.R')
@@ -13,11 +13,11 @@ source('Resources/haplo_functions.R')
 
 ping_haplo <- function(
   sample.location = '/home/common_arse/temp_indigo_all_missing_leftovers/',
-  fastq.pattern.1 = '_1.fastq.gz',
-  fastq.pattern.2 = '_2.fastq.gz',
+  fastq.pattern.1 = '1.fastq.gz',
+  fastq.pattern.2 = '2.fastq.gz',
   bowtie.threads  = 36,
   results.directory = '/home/common_arse/ping_troubleshooting/Results/temp_indigo_all_missing_leftovers/',
-  combined.csv.file = '/home/common_arse/ping_development_projects/GC_table_all_batches.csv',
+  combined.csv.file = '/home/common_arse/ping_development_projects/INDIGO_copyNumberFrame_2018dec12.csv',
   raw.kff.counts    = '/home/common_arse/INDIGO/3_PING_output/ping_haplo_3DL1S1_new_alleles_rerun_leftovers/raw_kff_counts.csv',
   DPthresh = 6
 ){
